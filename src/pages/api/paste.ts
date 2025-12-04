@@ -1,16 +1,36 @@
 import type { APIRoute } from 'astro';
 
-// Generate cryptographically secure 16-character ID with pbnj_ prefix
+// Generate human-readable ID using sandwich ingredients
 function generateId(): string {
-  const chars = 'abcdefghijklmnopqrstuvwxyz0123456789';
-  const bytes = new Uint8Array(16);
+  const ingredients = [
+    // Spreads & proteins
+    'peanut', 'butter', 'jelly', 'jam', 'honey', 'nutella', 'almond',
+    'cashew', 'hazelnut', 'tahini', 'hummus', 'avocado', 'cream',
+
+    // Breads
+    'wheat', 'white', 'rye', 'sourdough', 'multigrain', 'bagel',
+    'toast', 'roll', 'ciabatta', 'baguette', 'pita',
+
+    // Add-ons & flavors
+    'banana', 'strawberry', 'grape', 'raspberry', 'apricot', 'blueberry',
+    'chocolate', 'vanilla', 'cinnamon', 'coconut', 'maple', 'caramel',
+    'marshmallow', 'pretzel', 'granola', 'flax', 'chia', 'sesame',
+    'poppy', 'oat', 'quinoa', 'spelt',
+
+    // Textures & styles
+    'crunchy', 'smooth', 'chunky', 'creamy', 'toasted', 'grilled',
+    'fresh', 'wild', 'organic', 'natural', 'homemade', 'artisan'
+  ];
+
+  // Use crypto to randomly select 3 words
+  const bytes = new Uint8Array(3);
   crypto.getRandomValues(bytes);
 
-  let id = 'pbnj_';
-  for (let i = 0; i < 16; i++) {
-    id += chars[bytes[i] % chars.length];
-  }
-  return id;
+  const word1 = ingredients[bytes[0] % ingredients.length];
+  const word2 = ingredients[bytes[1] % ingredients.length];
+  const word3 = ingredients[bytes[2] % ingredients.length];
+
+  return `${word1}-${word2}-${word3}`;
 }
 
 // Detect language from filename extension
