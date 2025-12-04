@@ -241,7 +241,7 @@ async function deleteAllPastes(config) {
       process.exit(1);
     }
 
-    console.log('All pastes deleted.');
+    console.log('🗑️  [all pastes deleted]');
   } catch (err) {
     console.error(`Error: ${err.message}`);
     process.exit(1);
@@ -278,7 +278,7 @@ async function deletePaste(id, config) {
       process.exit(1);
     }
 
-    console.log(`Deleted: ${id}`);
+    console.log(`🗑️  [deleted: ${id}]`);
   } catch (err) {
     console.error(`Error: ${err.message}`);
     process.exit(1);
@@ -348,7 +348,7 @@ async function listPastes(config, limit = 10) {
     const { pastes } = await response.json();
 
     if (pastes.length === 0) {
-      console.log('No pastes found.');
+      console.log('📭 [no pastes found]');
       return;
     }
 
@@ -582,7 +582,7 @@ async function main() {
     // Update existing paste
     url = await updatePaste(updateId, code, language, filename, config);
     console.log(url);
-    console.log('(updated)');
+    console.log('✏️  [updated]');
   } else {
     // Create new paste
     url = await uploadPaste(code, language, filename, config, {
@@ -592,14 +592,14 @@ async function main() {
 
     console.log(url);
     if (isPrivate) {
-      console.log('(private paste - not listed on homepage)');
+      console.log('🔒 [private paste - not listed on homepage]');
     }
   }
 
   // Try to copy to clipboard
   const copied = await copyToClipboard(url);
   if (copied) {
-    console.log('(copied to clipboard)');
+    console.log('📋 [copied to clipboard]');
   }
 }
 
