@@ -1,5 +1,5 @@
 ---
-import config from '@/lib/config';
+import config, { theme } from '@/lib/config';
 
 interface Props {
 	title: string;
@@ -9,6 +9,9 @@ interface Props {
 const { title, description = "A minimal pastebin for code snippets" } = Astro.props;
 const siteUrl = Astro.url.origin;
 const currentUrl = Astro.url.href;
+
+// All themes use local CSS files
+const hljsStylePath = `/styles/hljs-${config.theme}.css`;
 ---
 
 <!doctype html>
@@ -19,6 +22,9 @@ const currentUrl = Astro.url.href;
 		<link rel="icon" type="image/png" href="/favicon.png" />
 		<meta name="generator" content={Astro.generator} />
 		<meta name="description" content={description} />
+
+		<!-- Highlight.js Theme (local) -->
+		<link rel="stylesheet" href={hljsStylePath} />
 
 		<!-- Open Graph -->
 		<meta property="og:type" content="website" />
@@ -35,7 +41,7 @@ const currentUrl = Astro.url.href;
 
 		<title>{title}</title>
 	</head>
-	<body class="bg-paper-bg min-h-screen font-sans">
+	<body class="bg-paper-bg min-h-screen font-sans text-paper-text flex flex-col">
 		<header class="sm:fixed sm:top-0 sm:left-0 w-full sm:z-50">
 			<div class="max-w-[1600px] mx-auto px-8 py-3">
 				<a href="/" class="hover:opacity-70 transition-opacity inline-block" aria-label={`${config.name} home`}>
@@ -43,8 +49,31 @@ const currentUrl = Astro.url.href;
 				</a>
 			</div>
 		</header>
-		<main class="sm:pt-16 px-8 max-w-[1600px] mx-auto">
+		<main class="sm:pt-16 px-8 max-w-[1600px] w-full mx-auto flex-1">
 			<slot />
 		</main>
+		{config.footer && (
+			<footer class="py-6 text-center text-paper-muted text-sm">
+				{config.footer.link ? (
+					<a
+						href={config.footer.link}
+						target="_blank"
+						rel="noopener noreferrer"
+						class="hover:text-paper-text transition-colors"
+					>
+						{config.footer.text}
+					</a>
+				) : (
+					<span>{config.footer.text}</span>
+				)}
+			</footer>
+		)}
 	</body>
 </html>
+
+<style is:global>
+	/* Ensure hljs uses theme background */
+	.hljs {
+		padding: 0 !important;
+	}
+</style>

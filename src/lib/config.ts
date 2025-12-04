@@ -1,4 +1,10 @@
 import userConfig from '../../pbnj.config.js';
+import { getTheme, defaultTheme, type Theme, type ThemeColors } from './themes';
+
+export interface FooterConfig {
+  text: string;
+  link?: string;
+}
 
 export interface PbnjConfig {
   name: string;
@@ -6,6 +12,8 @@ export interface PbnjConfig {
   idStyle: 'sandwich' | 'short' | 'uuid';
   homepage: boolean;
   maxPasteSize: string;
+  theme: string;
+  footer?: FooterConfig;
 }
 
 const defaults: PbnjConfig = {
@@ -14,12 +22,23 @@ const defaults: PbnjConfig = {
   idStyle: 'sandwich',
   homepage: true,
   maxPasteSize: '1mb',
+  theme: defaultTheme,
+  footer: {
+    text: 'spread the code 🥪',
+    link: 'https://github.com/bhavnicksm/pbnj',
+  },
 };
 
 export const config: PbnjConfig = {
   ...defaults,
   ...userConfig,
 };
+
+// Get the resolved theme object
+export const theme: Theme = getTheme(config.theme);
+
+// Export theme colors for easy access
+export const colors: ThemeColors = theme.colors;
 
 /**
  * Parse size string to bytes

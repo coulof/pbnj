@@ -167,8 +167,8 @@ const codePreview = paste.code.slice(0, 150).replace(/\n/g, ' ').trim() + (paste
 			</div>
 		</div>
 
-		<div class="border border-paper-border rounded overflow-hidden code-block">
-			<pre><code class="hljs" set:html={highlightedCode} /></pre>
+		<div class="border border-paper-border rounded overflow-hidden code-block bg-paper-bg2">
+			<pre class="bg-paper-bg2"><code class="hljs" set:html={highlightedCode} /></pre>
 		</div>
 	</div>
 
@@ -266,62 +266,9 @@ const codePreview = paste.code.slice(0, 150).replace(/\n/g, ' ').trim() + (paste
 			overflow-x: auto;
 			font-size: 0.875rem;
 			line-height: 1.625;
-			background: #F2F0E5 !important;
 		}
 		.code-block code {
 			font-family: 'SF Mono', Monaco, 'Courier New', monospace;
-			background: transparent !important;
-		}
-		/* Flexoki-inspired highlight.js overrides */
-		.hljs {
-			background: #F2F0E5 !important;
-			color: #100F0F;
-		}
-		.hljs-keyword,
-		.hljs-selector-tag,
-		.hljs-built_in,
-		.hljs-name,
-		.hljs-tag {
-			color: #66800B;
-		}
-		.hljs-string,
-		.hljs-title,
-		.hljs-section,
-		.hljs-attribute,
-		.hljs-literal,
-		.hljs-template-tag,
-		.hljs-template-variable,
-		.hljs-type {
-			color: #24837B;
-		}
-		.hljs-number,
-		.hljs-meta,
-		.hljs-params,
-		.hljs-variable,
-		.hljs-selector-id,
-		.hljs-selector-class {
-			color: #5E409D;
-		}
-		.hljs-function {
-			color: #205EA6;
-		}
-		.hljs-class .hljs-title {
-			color: #AD8301;
-		}
-		.hljs-comment,
-		.hljs-quote {
-			color: #6F6E69;
-			font-style: italic;
-		}
-		.hljs-doctag,
-		.hljs-keyword.hljs-atrule {
-			color: #A02F6F;
-		}
-		.hljs-deletion {
-			color: #D14D41;
-		}
-		.hljs-addition {
-			color: #879A39;
 		}
 	</style>
 </Layout>
