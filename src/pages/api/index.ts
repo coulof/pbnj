@@ -2,19 +2,42 @@ import type { APIRoute } from 'astro';
 import { codeToHtml } from 'shiki';
 import flexokiLight from '@/lib/flexoki-light.json';
 
-// Highlight code with Shiki
+// Escape HTML for plain text fallback
+function escapeHtml(text: string): string {
+  return text
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#039;');
+}
+
+// Generate plain HTML fallback (no syntax highlighting)
+function plainHtml(code: string): string {
+  return `<pre class="shiki" style="background-color:#F2F0E5;color:#100F0F"><code>${escapeHtml(code)}</code></pre>`;
+}
+
+// Highlight code with Shiki (with fallback for environments without WASM)
 async function highlightCode(code: string, language: string): Promise<string> {
   try {
     return await codeToHtml(code, {
       lang: language,
       theme: flexokiLight as any,
     });
-  } catch {
-    // Fallback if language not supported
-    return await codeToHtml(code, {
-      lang: 'text',
-      theme: flexokiLight as any,
-    });
+  } catch (error: any) {
+    // Check if it's a WASM error (Cloudflare Pages doesn't support WASM)
+    if (error?.message?.includes('WebAssembly') || error?.message?.includes('Wasm')) {
+      return plainHtml(code);
+    }
+    // Fallback if language not supported - try plain text
+    try {
+      return await codeToHtml(code, {
+        lang: 'text',
+        theme: flexokiLight as any,
+      });
+    } catch {
+      return plainHtml(code);
+    }
   }
 }
 
