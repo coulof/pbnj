@@ -1,0 +1,78 @@
+/**
+ * GitHub Dark theme for highlight.js
+ * Based on GitHub's dark mode syntax highlighting
+ */
+
+.hljs {
+  color: #c9d1d9;
+  background: transparent;
+}
+
+.hljs-keyword,
+.hljs-selector-tag,
+.hljs-title,
+.hljs-section,
+.hljs-doctag,
+.hljs-name,
+.hljs-strong {
+  color: #ff7b72;
+}
+
+.hljs-comment {
+  color: #8b949e;
+}
+
+.hljs-string,
+.hljs-title.class_,
+.hljs-class .hljs-title,
+.hljs-template-variable,
+.hljs-quote,
+.hljs-meta .hljs-meta-string {
+  color: #a5d6ff;
+}
+
+.hljs-type,
+.hljs-built_in,
+.hljs-symbol,
+.hljs-bullet,
+.hljs-link,
+.hljs-selector-id,
+.hljs-selector-class,
+.hljs-attr {
+  color: #ffa657;
+}
+
+.hljs-number,
+.hljs-literal,
+.hljs-variable,
+.hljs-template-tag,
+.hljs-tag .hljs-attr {
+  color: #79c0ff;
+}
+
+.hljs-regexp,
+.hljs-meta {
+  color: #7ee787;
+}
+
+.hljs-subst {
+  color: #c9d1d9;
+}
+
+.hljs-addition {
+  color: #aff5b4;
+  background-color: rgba(46, 160, 67, 0.15);
+}
+
+.hljs-deletion {
+  color: #ffdcd7;
+  background-color: rgba(248, 81, 73, 0.15);
+}
+
+.hljs-emphasis {
+  font-style: italic;
+}
+
+.hljs-strong {
+  font-weight: bold;
+}

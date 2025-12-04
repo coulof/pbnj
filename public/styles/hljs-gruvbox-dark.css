@@ -1,0 +1,91 @@
+/**
+ * Gruvbox Dark theme for highlight.js
+ * Based on the Gruvbox color scheme by morhetz
+ * https://github.com/morhetz/gruvbox
+ */
+
+.hljs {
+  color: #ebdbb2;
+  background: transparent;
+}
+
+.hljs-keyword,
+.hljs-selector-tag,
+.hljs-title,
+.hljs-section,
+.hljs-doctag,
+.hljs-name {
+  color: #fb4934;
+}
+
+.hljs-comment {
+  color: #928374;
+}
+
+.hljs-string,
+.hljs-title.class_,
+.hljs-class .hljs-title,
+.hljs-template-variable,
+.hljs-quote,
+.hljs-meta .hljs-meta-string {
+  color: #b8bb26;
+}
+
+.hljs-type,
+.hljs-built_in,
+.hljs-symbol,
+.hljs-bullet,
+.hljs-link,
+.hljs-selector-id,
+.hljs-selector-class,
+.hljs-attr {
+  color: #fabd2f;
+}
+
+.hljs-number,
+.hljs-literal {
+  color: #d3869b;
+}
+
+.hljs-variable,
+.hljs-template-tag {
+  color: #83a598;
+}
+
+.hljs-tag .hljs-attr {
+  color: #8ec07c;
+}
+
+.hljs-regexp {
+  color: #fe8019;
+}
+
+.hljs-meta {
+  color: #83a598;
+}
+
+.hljs-subst {
+  color: #ebdbb2;
+}
+
+.hljs-addition {
+  color: #b8bb26;
+  background-color: rgba(184, 187, 38, 0.15);
+}
+
+.hljs-deletion {
+  color: #fb4934;
+  background-color: rgba(251, 73, 52, 0.15);
+}
+
+.hljs-emphasis {
+  font-style: italic;
+}
+
+.hljs-strong {
+  font-weight: bold;
+}
+
+.hljs-function {
+  color: #8ec07c;
+}

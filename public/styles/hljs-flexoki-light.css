@@ -1,0 +1,108 @@
+/**
+ * Flexoki Light theme for highlight.js
+ * Based on the Flexoki color palette by Steph Ango
+ * https://stephango.com/flexoki
+ */
+
+.hljs {
+  color: #100F0F;
+  background: transparent;
+}
+
+.hljs-keyword,
+.hljs-selector-tag,
+.hljs-built_in,
+.hljs-name,
+.hljs-tag {
+  color: #66800B;
+}
+
+.hljs-string,
+.hljs-title,
+.hljs-section,
+.hljs-attribute,
+.hljs-literal,
+.hljs-template-tag,
+.hljs-template-variable,
+.hljs-type {
+  color: #24837B;
+}
+
+.hljs-number,
+.hljs-meta,
+.hljs-params,
+.hljs-variable,
+.hljs-selector-id,
+.hljs-selector-class {
+  color: #5E409D;
+}
+
+.hljs-function {
+  color: #205EA6;
+}
+
+.hljs-class .hljs-title,
+.hljs-title.class_ {
+  color: #AD8301;
+}
+
+.hljs-comment,
+.hljs-quote {
+  color: #6F6E69;
+  font-style: italic;
+}
+
+.hljs-doctag,
+.hljs-keyword.hljs-atrule {
+  color: #A02F6F;
+}
+
+.hljs-deletion {
+  color: #D14D41;
+  background-color: rgba(209, 77, 65, 0.1);
+}
+
+.hljs-addition {
+  color: #879A39;
+  background-color: rgba(135, 154, 57, 0.1);
+}
+
+.hljs-emphasis {
+  font-style: italic;
+}
+
+.hljs-strong {
+  font-weight: bold;
+}
+
+.hljs-link {
+  color: #205EA6;
+  text-decoration: underline;
+}
+
+.hljs-punctuation,
+.hljs-operator {
+  color: #100F0F;
+}
+
+.hljs-attr {
+  color: #BC5215;
+}
+
+.hljs-symbol,
+.hljs-bullet {
+  color: #AF3029;
+}
+
+.hljs-subst {
+  color: #100F0F;
+}
+
+.hljs-regexp {
+  color: #D14D41;
+}
+
+.hljs-selector-attr,
+.hljs-selector-pseudo {
+  color: #24837B;
+}

@@ -1,0 +1,88 @@
+/**
+ * Nord theme for highlight.js
+ * Based on the Nord color palette by Arctic Ice Studio
+ * https://www.nordtheme.com
+ */
+
+.hljs {
+  color: #d8dee9;
+  background: transparent;
+}
+
+.hljs-keyword,
+.hljs-selector-tag,
+.hljs-title,
+.hljs-section,
+.hljs-doctag,
+.hljs-name {
+  color: #81a1c1;
+}
+
+.hljs-comment {
+  color: #616e88;
+}
+
+.hljs-string,
+.hljs-title.class_,
+.hljs-class .hljs-title,
+.hljs-template-variable,
+.hljs-quote,
+.hljs-meta .hljs-meta-string {
+  color: #a3be8c;
+}
+
+.hljs-type,
+.hljs-built_in,
+.hljs-symbol,
+.hljs-bullet,
+.hljs-link,
+.hljs-selector-id,
+.hljs-selector-class,
+.hljs-attr {
+  color: #8fbcbb;
+}
+
+.hljs-number,
+.hljs-literal {
+  color: #b48ead;
+}
+
+.hljs-variable,
+.hljs-template-tag,
+.hljs-tag .hljs-attr {
+  color: #d8dee9;
+}
+
+.hljs-regexp {
+  color: #ebcb8b;
+}
+
+.hljs-meta {
+  color: #5e81ac;
+}
+
+.hljs-subst {
+  color: #d8dee9;
+}
+
+.hljs-addition {
+  color: #a3be8c;
+  background-color: rgba(163, 190, 140, 0.15);
+}
+
+.hljs-deletion {
+  color: #bf616a;
+  background-color: rgba(191, 97, 106, 0.15);
+}
+
+.hljs-emphasis {
+  font-style: italic;
+}
+
+.hljs-strong {
+  font-weight: bold;
+}
+
+.hljs-function {
+  color: #88c0d0;
+}

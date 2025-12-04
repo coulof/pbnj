@@ -1,0 +1,100 @@
+/**
+ * Catppuccin Macchiato theme for highlight.js
+ * https://github.com/catppuccin/catppuccin
+ */
+
+.hljs {
+  color: #cad3f5;
+  background: transparent;
+}
+
+.hljs-keyword,
+.hljs-selector-tag,
+.hljs-title,
+.hljs-section,
+.hljs-doctag,
+.hljs-name {
+  color: #c6a0f6;
+}
+
+.hljs-built_in {
+  color: #ed8796;
+}
+
+.hljs-comment {
+  color: #8087a2;
+}
+
+.hljs-string,
+.hljs-title.class_,
+.hljs-class .hljs-title,
+.hljs-template-variable,
+.hljs-quote,
+.hljs-meta .hljs-meta-string {
+  color: #a6da95;
+}
+
+.hljs-type,
+.hljs-symbol,
+.hljs-bullet,
+.hljs-link,
+.hljs-selector-id,
+.hljs-selector-class {
+  color: #f5a97f;
+}
+
+.hljs-number,
+.hljs-literal {
+  color: #f5a97f;
+}
+
+.hljs-variable,
+.hljs-template-tag {
+  color: #f4dbd6;
+}
+
+.hljs-attr {
+  color: #eed49f;
+}
+
+.hljs-tag .hljs-attr {
+  color: #8aadf4;
+}
+
+.hljs-regexp {
+  color: #f5bde6;
+}
+
+.hljs-meta {
+  color: #f5a97f;
+}
+
+.hljs-subst {
+  color: #cad3f5;
+}
+
+.hljs-function {
+  color: #8aadf4;
+}
+
+.hljs-params {
+  color: #cad3f5;
+}
+
+.hljs-addition {
+  color: #a6da95;
+  background-color: rgba(166, 218, 149, 0.15);
+}
+
+.hljs-deletion {
+  color: #ed8796;
+  background-color: rgba(237, 135, 150, 0.15);
+}
+
+.hljs-emphasis {
+  font-style: italic;
+}
+
+.hljs-strong {
+  font-weight: bold;
+}

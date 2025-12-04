@@ -1,0 +1,91 @@
+/**
+ * Gruvbox Light theme for highlight.js
+ * Based on the Gruvbox color scheme by morhetz
+ * https://github.com/morhetz/gruvbox
+ */
+
+.hljs {
+  color: #3c3836;
+  background: transparent;
+}
+
+.hljs-keyword,
+.hljs-selector-tag,
+.hljs-title,
+.hljs-section,
+.hljs-doctag,
+.hljs-name {
+  color: #9d0006;
+}
+
+.hljs-comment {
+  color: #928374;
+}
+
+.hljs-string,
+.hljs-title.class_,
+.hljs-class .hljs-title,
+.hljs-template-variable,
+.hljs-quote,
+.hljs-meta .hljs-meta-string {
+  color: #79740e;
+}
+
+.hljs-type,
+.hljs-built_in,
+.hljs-symbol,
+.hljs-bullet,
+.hljs-link,
+.hljs-selector-id,
+.hljs-selector-class,
+.hljs-attr {
+  color: #b57614;
+}
+
+.hljs-number,
+.hljs-literal {
+  color: #8f3f71;
+}
+
+.hljs-variable,
+.hljs-template-tag {
+  color: #076678;
+}
+
+.hljs-tag .hljs-attr {
+  color: #427b58;
+}
+
+.hljs-regexp {
+  color: #af3a03;
+}
+
+.hljs-meta {
+  color: #076678;
+}
+
+.hljs-subst {
+  color: #3c3836;
+}
+
+.hljs-addition {
+  color: #79740e;
+  background-color: rgba(121, 116, 14, 0.1);
+}
+
+.hljs-deletion {
+  color: #9d0006;
+  background-color: rgba(157, 0, 6, 0.1);
+}
+
+.hljs-emphasis {
+  font-style: italic;
+}
+
+.hljs-strong {
+  font-weight: bold;
+}
+
+.hljs-function {
+  color: #427b58;
+}
