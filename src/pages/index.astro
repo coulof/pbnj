@@ -1,5 +1,6 @@
 ---
 import Layout from '@/layouts/Layout.astro';
+import hljs from 'highlight.js';
 
 // Fetch pastes from D1 database
 const runtime = Astro.locals.runtime as any;
@@ -27,11 +28,18 @@ function formatDate(timestamp: number): string {
 	const weeks = Math.floor(days / 7);
 	return `${weeks} week${weeks > 1 ? 's' : ''} ago`;
 }
+
+// Highlight preview server-side
+function highlightPreview(code: string, language: string): string {
+	try {
+		return hljs.highlight(code, { language }).value;
+	} catch {
+		return hljs.highlightAuto(code).value;
+	}
+}
 ---
 
 <Layout title="pbnj.sh">
-	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github.min.css">
-
 	<div class="max-w-6xl mx-auto pt-6 pb-12">
 		<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
 		{pastes.length === 0 && (
@@ -43,7 +51,7 @@ function formatDate(timestamp: number): string {
 			<a href={`/${paste.id}`} class="group block">
 				<div class="h-56 flex flex-col cursor-pointer">
 					<div class="flex-1 overflow-hidden relative bg-paper-bg2 rounded preview-block">
-						<pre class="m-0 p-4 overflow-hidden text-xs leading-relaxed"><code class={`language-${paste.language}`}>{paste.preview}</code></pre>
+						<pre class="m-0 p-4 overflow-hidden text-xs leading-relaxed"><code class="hljs" set:html={highlightPreview(paste.preview, paste.language)} /></pre>
 						<div class="absolute bottom-0 left-0 right-0 h-16 bg-gradient-to-t from-paper-bg2 to-transparent pointer-events-none"></div>
 					</div>
 					<div class="py-2.5 bg-paper-bg">
@@ -59,11 +67,6 @@ function formatDate(timestamp: number): string {
 		))}
 		</div>
 	</div>
-
-	<script is:inline src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
-	<script is:inline>
-		hljs.highlightAll();
-	</script>
 </Layout>
 
 <style is:global>

@@ -1,5 +1,6 @@
 ---
 import Layout from '@/layouts/Layout.astro';
+import hljs from 'highlight.js';
 
 const { id } = Astro.params;
 
@@ -28,22 +29,19 @@ if (!paste) {
 	return Astro.redirect('/');
 }
 
-// Escape HTML for safe rendering
-function escapeHtml(text: string): string {
-	return text
-		.replace(/&/g, '&amp;')
-		.replace(/</g, '&lt;')
-		.replace(/>/g, '&gt;')
-		.replace(/"/g, '&quot;')
-		.replace(/'/g, '&#039;');
+// Highlight code server-side
+let highlightedCode: string;
+try {
+	const result = hljs.highlight(paste.code, { language: paste.language });
+	highlightedCode = result.value;
+} catch {
+	// Fallback to auto-detection if language not supported
+	const result = hljs.highlightAuto(paste.code);
+	highlightedCode = result.value;
 }
-
-const escapedCode = escapeHtml(paste.code);
 ---
 
 <Layout title={`${id} - pbnj.sh`}>
-	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github.min.css">
-
 	<div class="max-w-6xl mx-auto pb-12">
 		<div class="mb-3 flex items-center justify-between">
 			<h1 class="text-2xl font-medium text-paper-text">
@@ -88,14 +86,11 @@ const escapedCode = escapeHtml(paste.code);
 		</div>
 
 		<div class="border border-paper-border rounded overflow-hidden code-block">
-			<pre><code class={`language-${paste.language}`} set:html={escapedCode} /></pre>
+			<pre><code class="hljs" set:html={highlightedCode} /></pre>
 		</div>
 	</div>
 
-	<script is:inline src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
 	<script is:inline>
-		hljs.highlightAll();
-
 		document.getElementById('copy-btn')?.addEventListener('click', () => {
 			const code = document.querySelector('pre code')?.textContent;
 			if (code) {
