@@ -61,6 +61,7 @@ export const POST: APIRoute = async ({ request, locals }) => {
 
     let code: string;
     let language: string | undefined;
+    let filename: string | undefined;
 
     // Check content type to determine how to parse the request
     const contentType = request.headers.get('Content-Type') || '';
@@ -79,6 +80,7 @@ export const POST: APIRoute = async ({ request, locals }) => {
 
       // Read file content
       code = await file.text();
+      filename = file.name;
 
       // Detect language from filename or use provided language
       const providedLanguage = formData.get('language') as string | null;
@@ -113,9 +115,9 @@ export const POST: APIRoute = async ({ request, locals }) => {
     const created = Date.now();
 
     await runtime.env.DB.prepare(
-      'INSERT INTO pastes (id, code, language, created) VALUES (?, ?, ?, ?)'
+      'INSERT INTO pastes (id, code, language, created, filename) VALUES (?, ?, ?, ?, ?)'
     )
-      .bind(id, code, language || 'txt', created)
+      .bind(id, code, language || 'txt', created, filename || null)
       .run();
 
     // Return success response

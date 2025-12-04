@@ -9,7 +9,7 @@ let pastes: any[] = [];
 
 try {
 	const { results } = await runtime.env.DB.prepare(
-		'SELECT id, language, created, SUBSTR(code, 1, 200) as preview FROM pastes ORDER BY created DESC LIMIT 20'
+		'SELECT id, language, created, filename, SUBSTR(code, 1, 200) as preview FROM pastes ORDER BY created DESC LIMIT 20'
 	).all();
 
 	pastes = results || [];
@@ -47,7 +47,7 @@ function formatDate(timestamp: number): string {
 					</div>
 					<div class="px-5 py-3 bg-paper-bg rounded-b-lg">
 						<div class="text-sm font-medium text-paper-text mb-0.5">
-							{paste.id}.{paste.language}
+							{paste.filename || `${paste.id}.${paste.language}`}
 						</div>
 						<div class="text-xs text-paper-muted">
 							{formatDate(paste.created)}
