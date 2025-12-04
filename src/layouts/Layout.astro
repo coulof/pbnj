@@ -1,14 +1,11 @@
 ---
-import { Image } from 'astro:assets';
-import logo from '@/assets/logo.png';
-
 interface Props {
 	title: string;
 	description?: string;
 }
 
 const { title, description = "A minimal pastebin for code snippets" } = Astro.props;
-const siteUrl = "https://pbnj.sh";
+const siteUrl = Astro.url.origin;
 const currentUrl = Astro.url.href;
 ---
 
@@ -40,7 +37,7 @@ const currentUrl = Astro.url.href;
 		<header class="fixed top-0 left-0 w-full z-50">
 			<div class="max-w-[1600px] mx-auto px-8 py-3">
 				<a href="/" class="hover:opacity-70 transition-opacity inline-block" aria-label="pbnj.sh home">
-					<Image src={logo} alt="pbnj.sh" class="h-8 w-auto" loading="eager" />
+					<img src="/logo.png" alt="pbnj.sh" class="h-8 w-auto" loading="eager" />
 				</a>
 			</div>
 		</header>
