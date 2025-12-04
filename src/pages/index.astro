@@ -9,7 +9,7 @@ let pastes: any[] = [];
 
 try {
 	const { results } = await runtime.env.DB.prepare(
-		'SELECT id, language, created, filename, SUBSTR(code, 1, 200) as preview FROM pastes ORDER BY created DESC LIMIT 20'
+		'SELECT id, language, created, filename, highlighted_preview FROM pastes ORDER BY created DESC LIMIT 20'
 	).all();
 
 	pastes = results || [];
@@ -32,7 +32,8 @@ function formatDate(timestamp: number): string {
 ---
 
 <Layout title="pbnj.sh">
-	<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-6 pb-12">
+	<div class="max-w-6xl mx-auto pt-6 pb-12">
+		<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
 		{pastes.length === 0 && (
 			<div class="col-span-full text-center py-12 text-paper-muted">
 				No pastes yet. Create your first one!
@@ -40,12 +41,12 @@ function formatDate(timestamp: number): string {
 		)}
 		{pastes.map((paste) => (
 			<a href={`/${paste.id}`} class="group block">
-				<div class="h-64 flex flex-col cursor-pointer">
-					<div class="flex-1 overflow-hidden p-5 relative bg-paper-bg2 rounded">
-						<pre class="text-xs font-mono text-paper-text leading-relaxed overflow-hidden"><code>{paste.preview}</code></pre>
+				<div class="h-56 flex flex-col cursor-pointer">
+					<div class="flex-1 overflow-hidden relative bg-paper-bg2 rounded preview-block">
+						<div class="text-xs leading-relaxed overflow-hidden" set:html={paste.highlighted_preview} />
 						<div class="absolute bottom-0 left-0 right-0 h-16 bg-gradient-to-t from-paper-bg2 to-transparent pointer-events-none"></div>
 					</div>
-					<div class="px-5 py-2.5 bg-paper-bg">
+					<div class="py-2.5 bg-paper-bg">
 						<div class="text-sm font-medium text-paper-text leading-tight mb-0.5">
 							{paste.filename || `${paste.id}.${paste.language}`}
 						</div>
@@ -56,5 +57,19 @@ function formatDate(timestamp: number): string {
 				</div>
 			</a>
 		))}
+		</div>
 	</div>
 </Layout>
+
+<style is:global>
+	.preview-block pre {
+		margin: 0;
+		padding: 1.25rem;
+		overflow: hidden;
+		font-size: 0.75rem;
+		line-height: 1.625;
+	}
+	.preview-block code {
+		font-family: 'SF Mono', Monaco, 'Courier New', monospace;
+	}
+</style>

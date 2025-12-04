@@ -1,5 +1,6 @@
 import type { APIRoute } from 'astro';
 
+// DELETE /api/:id - Delete paste
 export const DELETE: APIRoute = async ({ params, request, locals }) => {
   try {
     const { id } = params;

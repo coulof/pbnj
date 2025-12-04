@@ -1,4 +1,22 @@
 import type { APIRoute } from 'astro';
+import { codeToHtml } from 'shiki';
+import flexokiLight from '@/lib/flexoki-light.json';
+
+// Highlight code with Shiki
+async function highlightCode(code: string, language: string): Promise<string> {
+  try {
+    return await codeToHtml(code, {
+      lang: language,
+      theme: flexokiLight as any,
+    });
+  } catch {
+    // Fallback if language not supported
+    return await codeToHtml(code, {
+      lang: 'text',
+      theme: flexokiLight as any,
+    });
+  }
+}
 
 // Generate human-readable ID: adjective-ingredient-ingredient-ingredient-thing
 function generateId(): string {
@@ -82,6 +100,52 @@ function detectLanguage(filename: string): string {
   return languageMap[ext || ''] || 'txt';
 }
 
+// Check if error is a unique constraint violation
+function isUniqueConstraintError(error: unknown): boolean {
+  if (error instanceof Error) {
+    return error.message.includes('UNIQUE constraint failed') ||
+           error.message.includes('duplicate key');
+  }
+  return false;
+}
+
+// GET /api - List pastes
+export const GET: APIRoute = async ({ url, locals }) => {
+  try {
+    const runtime = locals.runtime as any;
+
+    const cursor = parseInt(url.searchParams.get('cursor') || '0');
+    const limit = 20;
+
+    const { results } = await runtime.env.DB.prepare(
+      'SELECT id, language, created, SUBSTR(code, 1, 200) as preview FROM pastes ORDER BY created DESC LIMIT ? OFFSET ?'
+    )
+      .bind(limit, cursor)
+      .all();
+
+    return new Response(
+      JSON.stringify({
+        pastes: results,
+        nextCursor: results.length === limit ? cursor + limit : null,
+      }),
+      {
+        status: 200,
+        headers: { 'Content-Type': 'application/json' },
+      }
+    );
+  } catch (error) {
+    console.error('Error fetching pastes:', error);
+    return new Response(
+      JSON.stringify({ error: 'Internal server error' }),
+      {
+        status: 500,
+        headers: { 'Content-Type': 'application/json' },
+      }
+    );
+  }
+};
+
+// POST /api - Create paste
 export const POST: APIRoute = async ({ request, locals }) => {
   try {
     // Get runtime from Astro locals (Cloudflare binding)
@@ -129,6 +193,7 @@ export const POST: APIRoute = async ({ request, locals }) => {
       const body = await request.json();
       code = body.code;
       language = body.language;
+      filename = body.filename;
 
       if (!code) {
         return new Response(JSON.stringify({ error: 'Code is required' }), {
@@ -149,26 +214,60 @@ export const POST: APIRoute = async ({ request, locals }) => {
       });
     }
 
-    // Generate ID and insert into database
-    const id = generateId();
-    const created = Date.now();
+    // Try up to 3 times with different IDs in case of collision
+    const maxAttempts = 3;
+    let lastError: unknown;
 
-    await runtime.env.DB.prepare(
-      'INSERT INTO pastes (id, code, language, created, filename) VALUES (?, ?, ?, ?, ?)'
-    )
-      .bind(id, code, language || 'txt', created, filename || null)
-      .run();
+    for (let attempt = 0; attempt < maxAttempts; attempt++) {
+      const id = generateId();
+      const created = Date.now();
 
-    // Return success response
-    const url = `${new URL(request.url).origin}/${id}`;
+      try {
+        // Generate highlighted HTML for full code and preview
+        const lang = language || 'txt';
+        const preview = code.substring(0, 200);
+        const [highlightedCode, highlightedPreview] = await Promise.all([
+          highlightCode(code, lang),
+          highlightCode(preview, lang),
+        ]);
 
+        await runtime.env.DB.prepare(
+          'INSERT INTO pastes (id, code, language, created, filename, highlighted_code, highlighted_preview) VALUES (?, ?, ?, ?, ?, ?, ?)'
+        )
+          .bind(id, code, lang, created, filename || null, highlightedCode, highlightedPreview)
+          .run();
+
+        // Success - return the response
+        const url = `${new URL(request.url).origin}/${id}`;
+
+        return new Response(
+          JSON.stringify({
+            id,
+            url,
+          }),
+          {
+            status: 201,
+            headers: { 'Content-Type': 'application/json' },
+          }
+        );
+      } catch (error) {
+        lastError = error;
+        if (isUniqueConstraintError(error)) {
+          // ID collision, try again with a new ID
+          console.warn(`ID collision on attempt ${attempt + 1}, retrying...`);
+          continue;
+        }
+        // Different error, don't retry
+        throw error;
+      }
+    }
+
+    // All attempts failed due to collision
+    console.error('Failed to generate unique ID after', maxAttempts, 'attempts');
     return new Response(
-      JSON.stringify({
-        id,
-        url,
-      }),
+      JSON.stringify({ error: 'Could not generate unique ID, please try again' }),
       {
-        status: 201,
+        status: 500,
         headers: { 'Content-Type': 'application/json' },
       }
     );
