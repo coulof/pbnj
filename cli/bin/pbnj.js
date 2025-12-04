@@ -120,6 +120,7 @@ Usage:
   pbnj <file>              Upload a file
   pbnj -                   Read from stdin
   cat file | pbnj          Pipe content
+  pbnj -u <id> <file>      Update an existing paste
   pbnj -l                  List recent pastes
   pbnj -d <id>             Delete a paste
   pbnj --init              Configure your pbnj instance
@@ -129,6 +130,7 @@ Options:
   -f, --filename <name>    Set filename for the paste
   -p, --private            Create a private paste (not listed on homepage)
   -k, --key [key]          Require a key to view (auto-generates if no key given)
+  -u, --update <id>        Update an existing paste by ID
   -l, --list               List recent pastes
   -d, --delete <id>        Delete a paste by ID
   -h, --help               Show this help
@@ -146,6 +148,7 @@ Examples:
   pbnj -p script.py                 # Upload as private (unlisted)
   pbnj -p -k script.py              # Private with auto-generated key
   pbnj -p -k "mykey" script.py      # Private with custom key
+  pbnj -u crunchy-peanut-butter file.py  # Update a paste
   pbnj -l                           # Show recent pastes
   pbnj -d crunchy-peanut-butter     # Delete a paste
 `);
@@ -237,6 +240,49 @@ async function deletePaste(id, config) {
     }
 
     console.log(`Deleted: ${id}`);
+  } catch (err) {
+    console.error(`Error: ${err.message}`);
+    process.exit(1);
+  }
+}
+
+async function updatePaste(id, code, language, filename, config) {
+  const host = process.env.PBNJ_HOST || config.PBNJ_HOST;
+  const authKey = process.env.PBNJ_AUTH_KEY || config.PBNJ_AUTH_KEY;
+
+  if (!host) {
+    console.error('Error: No host configured.');
+    console.error('Run `pbnj --init` or set PBNJ_HOST environment variable.');
+    process.exit(1);
+  }
+
+  if (!authKey) {
+    console.error('Error: No auth key configured.');
+    console.error('Run `pbnj --init` or set PBNJ_AUTH_KEY environment variable.');
+    process.exit(1);
+  }
+
+  const body = { code };
+  if (language) body.language = language;
+  if (filename) body.filename = filename;
+
+  try {
+    const response = await fetch(`${host}/api/${id}`, {
+      method: 'PUT',
+      headers: {
+        'Authorization': `Bearer ${authKey}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(body),
+    });
+
+    if (!response.ok) {
+      const error = await response.json().catch(() => ({}));
+      console.error(`Error: ${error.error || response.statusText}`);
+      process.exit(1);
+    }
+
+    return `${host}/${id}`;
   } catch (err) {
     console.error(`Error: ${err.message}`);
     process.exit(1);
@@ -348,6 +394,7 @@ async function main() {
   let inputFile = null;
   let isPrivate = false;
   let secretKey = null;
+  let updateId = null;
 
   for (let i = 0; i < args.length; i++) {
     const arg = args[i];
@@ -392,6 +439,15 @@ async function main() {
 
     if (arg === '-f' || arg === '--filename') {
       filename = args[++i];
+      continue;
+    }
+
+    if (arg === '-u' || arg === '--update') {
+      updateId = args[++i];
+      if (!updateId) {
+        console.error('Error: Paste ID required for update');
+        process.exit(1);
+      }
       continue;
     }
 
@@ -456,14 +512,23 @@ async function main() {
     process.exit(1);
   }
 
-  const url = await uploadPaste(code, language, filename, config, {
-    isPrivate,
-    secretKey,
-  });
+  let url;
+  if (updateId) {
+    // Update existing paste
+    url = await updatePaste(updateId, code, language, filename, config);
+    console.log(url);
+    console.log('(updated)');
+  } else {
+    // Create new paste
+    url = await uploadPaste(code, language, filename, config, {
+      isPrivate,
+      secretKey,
+    });
 
-  console.log(url);
-  if (isPrivate) {
-    console.log('(private paste - not listed on homepage)');
+    console.log(url);
+    if (isPrivate) {
+      console.log('(private paste - not listed on homepage)');
+    }
   }
 
   // Try to copy to clipboard
