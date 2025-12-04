@@ -1,0 +1,32 @@
+{
+  "name": "@pbnjs/cli",
+  "version": "1.0.0",
+  "description": "CLI for pbnj.sh - A minimal pastebin for code snippets",
+  "type": "module",
+  "bin": {
+    "pbnj": "./bin/pbnj.js"
+  },
+  "files": [
+    "bin"
+  ],
+  "keywords": [
+    "pastebin",
+    "cli",
+    "code-sharing",
+    "pbnj"
+  ],
+  "author": "Bhavnick Minhas",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/bhavnicksm/pbnj.git",
+    "directory": "cli"
+  },
+  "homepage": "https://github.com/bhavnicksm/pbnj#readme",
+  "bugs": {
+    "url": "https://github.com/bhavnicksm/pbnj/issues"
+  },
+  "engines": {
+    "node": ">=18"
+  }
+}

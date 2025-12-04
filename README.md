@@ -11,6 +11,30 @@ A minimal, fast pastebin for code snippets. Built with Astro and deployed on Clo
 - Easy sharing with memorable URLs
 - Download and copy buttons
 - Social media preview cards
+- CLI tool for terminal workflows
+
+## CLI
+
+Install the CLI globally:
+
+```bash
+npm install -g @pbnjs/cli
+```
+
+Then use it:
+
+```bash
+# Upload a file
+pbnj script.py
+
+# Pipe content
+cat logs.txt | pbnj
+
+# Configure your instance
+pbnj --init
+```
+
+See [cli/README.md](./cli/README.md) for full documentation.
 
 ## Deploy Your Own
 
