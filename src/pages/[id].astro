@@ -51,7 +51,6 @@ if (!paste) {
 				</a>
 				<button
 					id="copy-btn"
-					onclick="navigator.clipboard.writeText(document.querySelector('pre code').textContent); const btn = document.getElementById('copy-btn'); const icon = btn.querySelector('svg'); icon.innerHTML = '<path stroke-linecap=\"round\" stroke-linejoin=\"round\" d=\"M5 13l4 4L19 7\"/>'; setTimeout(() => icon.innerHTML = '<rect x=\"9\" y=\"9\" width=\"13\" height=\"13\" rx=\"2\" ry=\"2\"></rect><path d=\"M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1\"></path>', 2000)"
 					class="p-2 text-paper-text bg-paper-bg2 border border-paper-border rounded hover:border-paper-border-hover transition-colors"
 					title="Copy to clipboard"
 				>
@@ -67,4 +66,21 @@ if (!paste) {
 			<pre class="p-6 bg-paper-bg2 overflow-x-auto"><code class="text-sm font-mono text-paper-text leading-relaxed">{paste.code}</code></pre>
 		</div>
 	</div>
+
+	<script>
+		document.getElementById('copy-btn')?.addEventListener('click', () => {
+			const code = document.querySelector('pre code')?.textContent;
+			if (code) {
+				navigator.clipboard.writeText(code);
+				const btn = document.getElementById('copy-btn');
+				const icon = btn?.querySelector('svg');
+				if (icon) {
+					icon.innerHTML = '<path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/>';
+					setTimeout(() => {
+						icon.innerHTML = '<rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>';
+					}, 2000);
+				}
+			}
+		});
+	</script>
 </Layout>
