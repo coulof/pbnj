@@ -14,13 +14,6 @@ try {
 	).bind(id).first();
 
 	paste = result;
-
-	// Increment view count
-	if (paste) {
-		await runtime.env.DB.prepare(
-			'UPDATE pastes SET views = views + 1 WHERE id = ?'
-		).bind(id).run();
-	}
 } catch (error) {
 	console.error('Error fetching paste:', error);
 }

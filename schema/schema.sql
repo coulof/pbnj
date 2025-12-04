@@ -7,7 +7,7 @@ CREATE TABLE IF NOT EXISTS pastes (
   language TEXT,
   created INTEGER NOT NULL,
   expires INTEGER,
-  views INTEGER DEFAULT 0
+  filename TEXT
 );
 
 CREATE INDEX IF NOT EXISTS idx_created ON pastes(created DESC);
