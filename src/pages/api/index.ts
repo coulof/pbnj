@@ -1,45 +1,4 @@
 import type { APIRoute } from 'astro';
-import { codeToHtml } from 'shiki';
-import flexokiLight from '@/lib/flexoki-light.json';
-
-// Escape HTML for plain text fallback
-function escapeHtml(text: string): string {
-  return text
-    .replace(/&/g, '&amp;')
-    .replace(/</g, '&lt;')
-    .replace(/>/g, '&gt;')
-    .replace(/"/g, '&quot;')
-    .replace(/'/g, '&#039;');
-}
-
-// Generate plain HTML fallback (no syntax highlighting)
-function plainHtml(code: string): string {
-  return `<pre class="shiki" style="background-color:#F2F0E5;color:#100F0F"><code>${escapeHtml(code)}</code></pre>`;
-}
-
-// Highlight code with Shiki (with fallback for environments without WASM)
-async function highlightCode(code: string, language: string): Promise<string> {
-  try {
-    return await codeToHtml(code, {
-      lang: language,
-      theme: flexokiLight as any,
-    });
-  } catch (error: any) {
-    // Check if it's a WASM error (Cloudflare Pages doesn't support WASM)
-    if (error?.message?.includes('WebAssembly') || error?.message?.includes('Wasm')) {
-      return plainHtml(code);
-    }
-    // Fallback if language not supported - try plain text
-    try {
-      return await codeToHtml(code, {
-        lang: 'text',
-        theme: flexokiLight as any,
-      });
-    } catch {
-      return plainHtml(code);
-    }
-  }
-}
 
 // Generate human-readable ID: adjective-ingredient-ingredient-ingredient-thing
 function generateId(): string {
@@ -120,7 +79,7 @@ function detectLanguage(filename: string): string {
     'kt': 'kotlin',
     'scala': 'scala',
   };
-  return languageMap[ext || ''] || 'txt';
+  return languageMap[ext || ''] || 'plaintext';
 }
 
 // Check if error is a unique constraint violation
@@ -141,7 +100,7 @@ export const GET: APIRoute = async ({ url, locals }) => {
     const limit = 20;
 
     const { results } = await runtime.env.DB.prepare(
-      'SELECT id, language, created, SUBSTR(code, 1, 200) as preview FROM pastes ORDER BY created DESC LIMIT ? OFFSET ?'
+      'SELECT id, language, created, filename, SUBSTR(code, 1, 200) as preview FROM pastes ORDER BY created DESC LIMIT ? OFFSET ?'
     )
       .bind(limit, cursor)
       .all();
@@ -227,7 +186,7 @@ export const POST: APIRoute = async ({ request, locals }) => {
     } else {
       // Handle plain text
       code = await request.text();
-      language = 'txt';
+      language = 'plaintext';
     }
 
     if (!code) {
@@ -244,20 +203,13 @@ export const POST: APIRoute = async ({ request, locals }) => {
     for (let attempt = 0; attempt < maxAttempts; attempt++) {
       const id = generateId();
       const created = Date.now();
+      const lang = language || 'plaintext';
 
       try {
-        // Generate highlighted HTML for full code and preview
-        const lang = language || 'txt';
-        const preview = code.substring(0, 200);
-        const [highlightedCode, highlightedPreview] = await Promise.all([
-          highlightCode(code, lang),
-          highlightCode(preview, lang),
-        ]);
-
         await runtime.env.DB.prepare(
-          'INSERT INTO pastes (id, code, language, created, filename, highlighted_code, highlighted_preview) VALUES (?, ?, ?, ?, ?, ?, ?)'
+          'INSERT INTO pastes (id, code, language, created, filename) VALUES (?, ?, ?, ?, ?)'
         )
-          .bind(id, code, lang, created, filename || null, highlightedCode, highlightedPreview)
+          .bind(id, code, lang, created, filename || null)
           .run();
 
         // Success - return the response
