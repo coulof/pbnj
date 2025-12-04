@@ -82,6 +82,13 @@ function detectLanguage(filename: string): string {
   return languageMap[ext || ''] || 'plaintext';
 }
 
+// Generate a random secret key for private pastes
+function generateSecretKey(): string {
+  const bytes = new Uint8Array(16);
+  crypto.getRandomValues(bytes);
+  return Array.from(bytes).map(b => b.toString(16).padStart(2, '0')).join('');
+}
+
 // Check if error is a unique constraint violation
 function isUniqueConstraintError(error: unknown): boolean {
   if (error instanceof Error) {
@@ -100,7 +107,7 @@ export const GET: APIRoute = async ({ url, locals }) => {
     const limit = 20;
 
     const { results } = await runtime.env.DB.prepare(
-      'SELECT id, language, updated, filename, SUBSTR(code, 1, 200) as preview FROM pastes ORDER BY updated DESC LIMIT ? OFFSET ?'
+      'SELECT id, language, updated, filename, SUBSTR(code, 1, 200) as preview FROM pastes WHERE is_private = 0 OR is_private IS NULL ORDER BY updated DESC LIMIT ? OFFSET ?'
     )
       .bind(limit, cursor)
       .all();
@@ -147,6 +154,8 @@ export const POST: APIRoute = async ({ request, locals }) => {
     let code: string;
     let language: string | undefined;
     let filename: string | undefined;
+    let isPrivate = false;
+    let secretKey: string | null = null;
 
     // Check content type to determine how to parse the request
     const contentType = request.headers.get('Content-Type') || '';
@@ -170,12 +179,27 @@ export const POST: APIRoute = async ({ request, locals }) => {
       // Detect language from filename or use provided language
       const providedLanguage = formData.get('language') as string | null;
       language = providedLanguage || detectLanguage(file.name);
+
+      // Handle private flag and key
+      isPrivate = formData.get('private') === 'true';
+      const keyParam = formData.get('key') as string | null;
+      if (keyParam) {
+        secretKey = keyParam === 'true' ? generateSecretKey() : keyParam;
+        isPrivate = true; // If key is provided, paste is automatically private
+      }
     } else if (contentType.includes('application/json')) {
       // Handle JSON (original format)
       const body = await request.json();
       code = body.code;
       language = body.language;
       filename = body.filename;
+      isPrivate = body.private === true;
+
+      // Handle key: true (auto-generate) or key: "custom-key"
+      if (body.key) {
+        secretKey = body.key === true ? generateSecretKey() : body.key;
+        isPrivate = true; // If key is provided, paste is automatically private
+      }
 
       if (!code) {
         return new Response(JSON.stringify({ error: 'Code is required' }), {
@@ -207,18 +231,20 @@ export const POST: APIRoute = async ({ request, locals }) => {
 
       try {
         await runtime.env.DB.prepare(
-          'INSERT INTO pastes (id, code, language, updated, filename) VALUES (?, ?, ?, ?, ?)'
+          'INSERT INTO pastes (id, code, language, updated, filename, is_private, secret_key) VALUES (?, ?, ?, ?, ?, ?, ?)'
         )
-          .bind(id, code, lang, updated, filename || null)
+          .bind(id, code, lang, updated, filename || null, isPrivate ? 1 : 0, secretKey)
           .run();
 
         // Success - return the response
-        const url = `${new URL(request.url).origin}/${id}`;
+        const baseUrl = `${new URL(request.url).origin}/${id}`;
+        const url = secretKey ? `${baseUrl}?key=${secretKey}` : baseUrl;
 
         return new Response(
           JSON.stringify({
             id,
             url,
+            private: isPrivate,
           }),
           {
             status: 201,

@@ -7,7 +7,9 @@ CREATE TABLE IF NOT EXISTS pastes (
   language TEXT,
   updated INTEGER NOT NULL,
   expires INTEGER,
-  filename TEXT
+  filename TEXT,
+  is_private INTEGER DEFAULT 0,
+  secret_key TEXT
 );
 
 CREATE INDEX IF NOT EXISTS idx_updated ON pastes(updated DESC);

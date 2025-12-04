@@ -9,7 +9,6 @@ const execAsync = promisify(exec);
 
 // Configuration
 const CONFIG_FILE = `${process.env.HOME}/.pbnj`;
-const DEFAULT_HOST = 'https://pbnj.sh';
 
 // Language detection from file extension
 const LANG_MAP = {
@@ -121,23 +120,34 @@ Usage:
   pbnj <file>              Upload a file
   pbnj -                   Read from stdin
   cat file | pbnj          Pipe content
+  pbnj -l                  List recent pastes
+  pbnj -d <id>             Delete a paste
   pbnj --init              Configure your pbnj instance
 
 Options:
-  -l, --language <lang>    Override language detection
+  -L, --language <lang>    Override language detection
   -f, --filename <name>    Set filename for the paste
+  -p, --private            Create a private paste (not listed on homepage)
+  -k, --key [key]          Require a key to view (auto-generates if no key given)
+  -l, --list               List recent pastes
+  -d, --delete <id>        Delete a paste by ID
   -h, --help               Show this help
   -v, --version            Show version
   --init                   Set up configuration
 
 Configuration (~/.pbnj):
-  PBNJ_HOST=https://your-instance.workers.dev
+  PBNJ_HOST=https://your-pbnj-instance.workers.dev
   PBNJ_AUTH_KEY=your-secret-key
 
 Examples:
   pbnj script.py                    # Upload Python file
-  cat logs.txt | pbnj -l plaintext  # Pipe with language
+  cat logs.txt | pbnj -L plaintext  # Pipe with language
   pbnj -f "app.js" - < code.txt     # Custom filename from stdin
+  pbnj -p script.py                 # Upload as private (unlisted)
+  pbnj -p -k script.py              # Private with auto-generated key
+  pbnj -p -k "mykey" script.py      # Private with custom key
+  pbnj -l                           # Show recent pastes
+  pbnj -d crunchy-peanut-butter     # Delete a paste
 `);
 }
 
@@ -150,14 +160,45 @@ async function initConfig() {
 
   const question = (q) => new Promise((resolve) => rl.question(q, resolve));
 
-  console.log('\nConfiguring pbnj CLI\n');
+  console.log(`
+                                ███████
+                          ███▓           ███
+                    ████                     ██░
+              ████                               ███
+       ▒███▓                                         ████
+   ██░                                                     ███▒
+ █                                                              ███
+ ██                                                                █
+ █▒███                                                             ██
+ █▒▒▒▒▒███                                                     ███▒█
+ █▒▒▒▒▒▒▒▒▒▒▒███                                          ███▒▒▒▒▒▒█
+  ███▒▒▒▒▒▒▒▒▒▒▒▒▒██                             ░  ████▒▒▒▒▒▒▒▒▒▒▒█
+ ██▒█████▒▒▒▒▒▒▒▒▒▒▒██                         ███▒▒▒▒▒▒▒▒▒▒▒▒▒████
+███████████████▒▒▒▒▒▒▒▒██                 ███▒▒▒▒▒▒▒▒▒▒▒▒▒███████▓██
+███░░  ▒██░████████▒▒▒▓▒▒▒████      ▒███▓▒▒▒▒▒▒▒▒▒▓▒▒██████████████░█
+██▒▒███░░████████████▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▓▒▒▓▒▒▒▒▒▒▓███████████████░░▒░██
+██▒▒▒▒▒█░░░░░   ░███████▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒████████████░░░░░░░░░██▒▒█
+ ██▒▒▒▒▓▓██████░ ░██████████▒▒▒▒▒▒▒▒▒▒▒██████████████░ ▒▒▒░███▒▒▒▒▒▒█
+    ██▒▒▒▒▒▒▒▒▒▓█░░░███████████████████████████████░░░██▓▓▒▒▒▒▒▒▒▒▒█
+       ████▓▒▒▒▒▓██░░░   ░█████████████████░  ▒▒░░▒██▒▒▒▒▒▒▒▒▒▒███
+            ███▒▒▒▒▓▓███▒░░░████████████░░ ▒▒██▓▓▓▓▒▒▓▒▒▒▒████
+                ██▒▒▒▒▒▒▒█░░ ░░░░░  ░▒▒▒▒▒██▒▒▒▒▓▒▒▒▒███
+                   ██▒▒▒▒▒▒▓██████████▓▓▓▓▒▒▓▒▒▒███
+                     ██▒▒▒▒▒▒▒▒▒▒▒▒▒▓▒▒▒▒▒▒▓███
+                        ██▒▒▒▒▒▒▒▒▒▒▓▒▒▒███
+                            ██████████
 
-  const host = await question(`Host URL (default: ${DEFAULT_HOST}): `);
+                            p b n j . s h
+`);
+
+  console.log('Configuring pbnj CLI\n');
+
+  const host = await question('Host URL: ');
   const authKey = await question('Auth Key: ');
 
   rl.close();
 
-  const config = `PBNJ_HOST=${host || DEFAULT_HOST}\nPBNJ_AUTH_KEY=${authKey}\n`;
+  const config = `PBNJ_HOST=${host}\nPBNJ_AUTH_KEY=${authKey}\n`;
 
   const { writeFileSync } = await import('fs');
   writeFileSync(CONFIG_FILE, config, { mode: 0o600 });
@@ -165,9 +206,103 @@ async function initConfig() {
   console.log(`\nConfiguration saved to ${CONFIG_FILE}`);
 }
 
-async function uploadPaste(code, language, filename, config) {
-  const host = config.PBNJ_HOST || process.env.PBNJ_HOST || DEFAULT_HOST;
-  const authKey = config.PBNJ_AUTH_KEY || process.env.PBNJ_AUTH_KEY;
+async function deletePaste(id, config) {
+  const host = process.env.PBNJ_HOST || config.PBNJ_HOST;
+  const authKey = process.env.PBNJ_AUTH_KEY || config.PBNJ_AUTH_KEY;
+
+  if (!host) {
+    console.error('Error: No host configured.');
+    console.error('Run `pbnj --init` or set PBNJ_HOST environment variable.');
+    process.exit(1);
+  }
+
+  if (!authKey) {
+    console.error('Error: No auth key configured.');
+    console.error('Run `pbnj --init` or set PBNJ_AUTH_KEY environment variable.');
+    process.exit(1);
+  }
+
+  try {
+    const response = await fetch(`${host}/api/${id}`, {
+      method: 'DELETE',
+      headers: {
+        'Authorization': `Bearer ${authKey}`,
+      },
+    });
+
+    if (!response.ok) {
+      const error = await response.json().catch(() => ({}));
+      console.error(`Error: ${error.error || response.statusText}`);
+      process.exit(1);
+    }
+
+    console.log(`Deleted: ${id}`);
+  } catch (err) {
+    console.error(`Error: ${err.message}`);
+    process.exit(1);
+  }
+}
+
+async function listPastes(config) {
+  const host = process.env.PBNJ_HOST || config.PBNJ_HOST;
+
+  if (!host) {
+    console.error('Error: No host configured.');
+    console.error('Run `pbnj --init` or set PBNJ_HOST environment variable.');
+    process.exit(1);
+  }
+
+  try {
+    const response = await fetch(`${host}/api`);
+
+    if (!response.ok) {
+      console.error(`Error: ${response.statusText}`);
+      process.exit(1);
+    }
+
+    const { pastes } = await response.json();
+
+    if (pastes.length === 0) {
+      console.log('No pastes found.');
+      return;
+    }
+
+    console.log('');
+    for (const paste of pastes) {
+      const name = paste.filename || `${paste.id}.${paste.language}`;
+      const age = formatAge(paste.updated);
+      console.log(`  ${name}`);
+      console.log(`  ${host}/${paste.id}  (${age})`);
+      console.log('');
+    }
+  } catch (err) {
+    console.error(`Error: ${err.message}`);
+    process.exit(1);
+  }
+}
+
+function formatAge(timestamp) {
+  const diff = Date.now() - timestamp;
+  const minutes = Math.floor(diff / 60000);
+  if (minutes < 1) return 'just now';
+  if (minutes < 60) return `${minutes}m ago`;
+  const hours = Math.floor(minutes / 60);
+  if (hours < 24) return `${hours}h ago`;
+  const days = Math.floor(hours / 24);
+  if (days < 7) return `${days}d ago`;
+  const weeks = Math.floor(days / 7);
+  return `${weeks}w ago`;
+}
+
+async function uploadPaste(code, language, filename, config, options = {}) {
+  const host = process.env.PBNJ_HOST || config.PBNJ_HOST;
+  const authKey = process.env.PBNJ_AUTH_KEY || config.PBNJ_AUTH_KEY;
+
+  if (!host) {
+    console.error('Error: No host configured.');
+    console.error('Run `pbnj --init` or set PBNJ_HOST environment variable.');
+    process.exit(1);
+  }
 
   if (!authKey) {
     console.error('Error: No auth key configured.');
@@ -177,6 +312,8 @@ async function uploadPaste(code, language, filename, config) {
 
   const body = { code, language };
   if (filename) body.filename = filename;
+  if (options.isPrivate) body.private = true;
+  if (options.secretKey) body.key = options.secretKey;
 
   try {
     const response = await fetch(`${host}/api`, {
@@ -209,6 +346,8 @@ async function main() {
   let language = null;
   let filename = null;
   let inputFile = null;
+  let isPrivate = false;
+  let secretKey = null;
 
   for (let i = 0; i < args.length; i++) {
     const arg = args[i];
@@ -229,13 +368,56 @@ async function main() {
       process.exit(0);
     }
 
-    if (arg === '-l' || arg === '--language') {
+    if (arg === '-l' || arg === '--list') {
+      const config = getConfig();
+      await listPastes(config);
+      process.exit(0);
+    }
+
+    if (arg === '-d' || arg === '--delete') {
+      const id = args[++i];
+      if (!id) {
+        console.error('Error: Paste ID required for delete');
+        process.exit(1);
+      }
+      const config = getConfig();
+      await deletePaste(id, config);
+      process.exit(0);
+    }
+
+    if (arg === '-L' || arg === '--language') {
       language = args[++i];
       continue;
     }
 
     if (arg === '-f' || arg === '--filename') {
       filename = args[++i];
+      continue;
+    }
+
+    if (arg === '-p' || arg === '--private') {
+      isPrivate = true;
+      continue;
+    }
+
+    if (arg === '-k' || arg === '--key') {
+      // Check if next arg is a value (not another flag or file)
+      const nextArg = args[i + 1];
+      if (nextArg && !nextArg.startsWith('-') && nextArg !== '-') {
+        // Check if it looks like a key value (not a filename)
+        // If it has no extension or is alphanumeric only, treat as key
+        if (!nextArg.includes('.') || /^[a-zA-Z0-9_-]+$/.test(nextArg)) {
+          secretKey = nextArg;
+          i++;
+        } else {
+          // No key value provided, auto-generate
+          secretKey = true;
+        }
+      } else {
+        // No key value provided, auto-generate
+        secretKey = true;
+      }
+      isPrivate = true; // -k implies -p
       continue;
     }
 
@@ -274,9 +456,15 @@ async function main() {
     process.exit(1);
   }
 
-  const url = await uploadPaste(code, language, filename, config);
+  const url = await uploadPaste(code, language, filename, config, {
+    isPrivate,
+    secretKey,
+  });
 
   console.log(url);
+  if (isPrivate) {
+    console.log('(private paste - not listed on homepage)');
+  }
 
   // Try to copy to clipboard
   const copied = await copyToClipboard(url);

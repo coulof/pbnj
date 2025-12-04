@@ -22,6 +22,14 @@ if (!paste) {
 	return Astro.redirect('/');
 }
 
+// Check if paste requires a key
+if (paste.secret_key) {
+	const providedKey = Astro.url.searchParams.get('key');
+	if (providedKey !== paste.secret_key) {
+		return new Response('Not found', { status: 404 });
+	}
+}
+
 // Highlight code server-side
 let highlightedCode: string;
 try {

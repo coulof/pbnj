@@ -23,7 +23,7 @@ pbnj --init
 ```
 
 This will prompt you for:
-- **Host URL**: Your pbnj instance (default: https://pbnj.sh)
+- **Host URL**: Your pbnj instance URL
 - **Auth Key**: Your secret key for creating pastes
 
 Configuration is saved to `~/.pbnj`.
@@ -51,7 +51,7 @@ pbnj script.py
 cat error.log | pbnj
 # https://pbnj.sh/smooth-jelly-grape-sandwich
 
-echo "console.log('hello')" | pbnj -l javascript
+echo "console.log('hello')" | pbnj -L javascript
 # https://pbnj.sh/golden-honey-oat-bagel
 ```
 
@@ -64,7 +64,7 @@ pbnj - < code.txt
 ### Override language detection
 
 ```bash
-pbnj -l typescript myfile.ts
+pbnj -L typescript myfile.ts
 ```
 
 ### Set custom filename
@@ -73,12 +73,26 @@ pbnj -l typescript myfile.ts
 pbnj -f "app.js" - < code.txt
 ```
 
+### List recent pastes
+
+```bash
+pbnj -l
+```
+
+### Delete a paste
+
+```bash
+pbnj -d crunchy-peanut-butter
+```
+
 ## Options
 
 | Option | Description |
 |--------|-------------|
-| `-l, --language <lang>` | Override automatic language detection |
+| `-L, --language <lang>` | Override automatic language detection |
 | `-f, --filename <name>` | Set filename for the paste |
+| `-l, --list` | List recent pastes |
+| `-d, --delete <id>` | Delete a paste by ID |
 | `-h, --help` | Show help |
 | `-v, --version` | Show version |
 | `--init` | Configure your pbnj instance |
