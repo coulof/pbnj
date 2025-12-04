@@ -123,6 +123,7 @@ Usage:
   pbnj -u <id> <file>      Update an existing paste
   pbnj -l                  List recent pastes
   pbnj -d <id>             Delete a paste
+  pbnj -D                  Delete all pastes
   pbnj --init              Configure your pbnj instance
 
 Options:
@@ -133,6 +134,7 @@ Options:
   -u, --update <id>        Update an existing paste by ID
   -l, --list               List recent pastes
   -d, --delete <id>        Delete a paste by ID
+  -D, --delete-all         Delete all pastes
   -h, --help               Show this help
   -v, --version            Show version
   --init                   Set up configuration
@@ -207,6 +209,43 @@ async function initConfig() {
   writeFileSync(CONFIG_FILE, config, { mode: 0o600 });
 
   console.log(`\nConfiguration saved to ${CONFIG_FILE}`);
+}
+
+async function deleteAllPastes(config) {
+  const host = process.env.PBNJ_HOST || config.PBNJ_HOST;
+  const authKey = process.env.PBNJ_AUTH_KEY || config.PBNJ_AUTH_KEY;
+
+  if (!host) {
+    console.error('Error: No host configured.');
+    console.error('Run `pbnj --init` or set PBNJ_HOST environment variable.');
+    process.exit(1);
+  }
+
+  if (!authKey) {
+    console.error('Error: No auth key configured.');
+    console.error('Run `pbnj --init` or set PBNJ_AUTH_KEY environment variable.');
+    process.exit(1);
+  }
+
+  try {
+    const response = await fetch(`${host}/api/`, {
+      method: 'DELETE',
+      headers: {
+        'Authorization': `Bearer ${authKey}`,
+      },
+    });
+
+    if (!response.ok) {
+      const error = await response.json().catch(() => ({}));
+      console.error(`Error: ${error.error || response.statusText}`);
+      process.exit(1);
+    }
+
+    console.log('All pastes deleted.');
+  } catch (err) {
+    console.error(`Error: ${err.message}`);
+    process.exit(1);
+  }
 }
 
 async function deletePaste(id, config) {
@@ -418,6 +457,12 @@ async function main() {
     if (arg === '-l' || arg === '--list') {
       const config = getConfig();
       await listPastes(config);
+      process.exit(0);
+    }
+
+    if (arg === '-D' || arg === '--delete-all') {
+      const config = getConfig();
+      await deleteAllPastes(config);
       process.exit(0);
     }
 

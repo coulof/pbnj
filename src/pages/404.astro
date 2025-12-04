@@ -1,0 +1,17 @@
+---
+import Layout from '@/layouts/Layout.astro';
+import config from '@/lib/config';
+---
+
+<Layout title={`404 - ${config.name}`} description="Paste not found">
+	<div class="max-w-2xl mx-auto pt-12 pb-24 text-center">
+		<img src="/404.png" alt="404 - Paste not found" class="mx-auto mb-8 max-w-md w-full" />
+		<h1 class="text-2xl font-medium text-paper-text mb-3">Paste not found</h1>
+		<p class="text-paper-muted mb-6">
+			The paste you're looking for doesn't exist or has been removed.
+		</p>
+		<a href="/" class="inline-block px-4 py-2 bg-paper-bg2 border border-paper-border rounded hover:border-paper-border-hover transition-colors text-paper-text">
+			Go home
+		</a>
+	</div>
+</Layout>

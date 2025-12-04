@@ -1,53 +1,6 @@
 import type { APIRoute } from 'astro';
-
-// Generate human-readable ID: adjective-ingredient-ingredient-ingredient-thing
-function generateId(): string {
-  const adjectives = [
-    'crunchy', 'smooth', 'chunky', 'creamy', 'toasted', 'grilled',
-    'fresh', 'wild', 'organic', 'natural', 'homemade', 'artisan',
-    'crispy', 'fluffy', 'golden', 'warm', 'sweet', 'savory',
-    'tangy', 'spicy', 'mild', 'bold', 'classic', 'fancy',
-    'simple', 'rustic', 'gourmet', 'premium', 'deluxe', 'perfect',
-  ];
-
-  const ingredients = [
-    // Spreads & proteins
-    'peanut', 'butter', 'jelly', 'jam', 'honey', 'nutella', 'almond',
-    'cashew', 'hazelnut', 'tahini', 'hummus', 'avocado', 'cream', 'cheese',
-    'ricotta', 'mayo', 'mustard', 'aioli', 'pesto', 'olive', 'tapenade',
-
-    // Fruits & veggies
-    'banana', 'strawberry', 'grape', 'raspberry', 'apricot', 'blueberry',
-    'apple', 'pear', 'peach', 'plum', 'cherry', 'mango', 'fig',
-    'tomato', 'cucumber', 'lettuce', 'spinach', 'arugula', 'kale',
-
-    // Nuts & seeds
-    'walnut', 'pecan', 'pistachio', 'sunflower', 'pumpkin',
-    'flax', 'chia', 'sesame', 'poppy', 'hemp',
-
-    // Flavors
-    'chocolate', 'vanilla', 'cinnamon', 'coconut', 'maple', 'caramel',
-    'marshmallow', 'pretzel', 'granola', 'oat', 'bacon', 'ham',
-  ];
-
-  const things = [
-    'sandwich', 'burger', 'bun', 'wrap', 'bagel', 'roll',
-    'toast', 'melt', 'panini', 'hoagie', 'sub', 'hero',
-    'club', 'grinder', 'slider', 'pocket', 'pretzel', 'waffle',
-  ];
-
-  // Use crypto to randomly select words
-  const bytes = new Uint8Array(5);
-  crypto.getRandomValues(bytes);
-
-  const adjective = adjectives[bytes[0] % adjectives.length];
-  const ingredient1 = ingredients[bytes[1] % ingredients.length];
-  const ingredient2 = ingredients[bytes[2] % ingredients.length];
-  const ingredient3 = ingredients[bytes[3] % ingredients.length];
-  const thing = things[bytes[4] % things.length];
-
-  return `${adjective}-${ingredient1}-${ingredient2}-${ingredient3}-${thing}`;
-}
+import { generateId } from '@/lib/id';
+import config, { parseSize } from '@/lib/config';
 
 // Detect language from filename extension
 function detectLanguage(filename: string): string {
@@ -124,6 +77,44 @@ export const GET: APIRoute = async ({ url, locals }) => {
     );
   } catch (error) {
     console.error('Error fetching pastes:', error);
+    return new Response(
+      JSON.stringify({ error: 'Internal server error' }),
+      {
+        status: 500,
+        headers: { 'Content-Type': 'application/json' },
+      }
+    );
+  }
+};
+
+// DELETE /api - Delete all pastes (requires auth)
+export const DELETE: APIRoute = async ({ request, locals }) => {
+  try {
+    const runtime = locals.runtime as any;
+
+    // Check authentication
+    const authHeader = request.headers.get('Authorization');
+    const expectedAuth = `Bearer ${runtime.env.AUTH_KEY}`;
+
+    if (authHeader !== expectedAuth) {
+      return new Response(JSON.stringify({ error: 'Unauthorized' }), {
+        status: 401,
+        headers: { 'Content-Type': 'application/json' },
+      });
+    }
+
+    // Delete all pastes
+    await runtime.env.DB.prepare('DELETE FROM pastes').run();
+
+    return new Response(
+      JSON.stringify({ message: 'All pastes deleted' }),
+      {
+        status: 200,
+        headers: { 'Content-Type': 'application/json' },
+      }
+    );
+  } catch (error) {
+    console.error('Error deleting pastes:', error);
     return new Response(
       JSON.stringify({ error: 'Internal server error' }),
       {
@@ -216,6 +207,16 @@ export const POST: APIRoute = async ({ request, locals }) => {
     if (!code) {
       return new Response(JSON.stringify({ error: 'Code is required' }), {
         status: 400,
+        headers: { 'Content-Type': 'application/json' },
+      });
+    }
+
+    // Check paste size limit
+    const maxSize = parseSize(config.maxPasteSize);
+    const codeSize = new TextEncoder().encode(code).length;
+    if (codeSize > maxSize) {
+      return new Response(JSON.stringify({ error: `Paste too large. Maximum size is ${config.maxPasteSize}` }), {
+        status: 413,
         headers: { 'Content-Type': 'application/json' },
       });
     }

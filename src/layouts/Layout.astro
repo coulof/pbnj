@@ -1,4 +1,6 @@
 ---
+import config from '@/lib/config';
+
 interface Props {
 	title: string;
 	description?: string;
@@ -36,8 +38,8 @@ const currentUrl = Astro.url.href;
 	<body class="bg-paper-bg min-h-screen font-sans">
 		<header class="sm:fixed sm:top-0 sm:left-0 w-full sm:z-50">
 			<div class="max-w-[1600px] mx-auto px-8 py-3">
-				<a href="/" class="hover:opacity-70 transition-opacity inline-block" aria-label="pbnj.sh home">
-					<img src="/logo.png" alt="pbnj.sh" class="h-8 w-auto" loading="eager" />
+				<a href="/" class="hover:opacity-70 transition-opacity inline-block" aria-label={`${config.name} home`}>
+					<img src={config.logo} alt={config.name} class="h-8 w-auto" loading="eager" />
 				</a>
 			</div>
 		</header>

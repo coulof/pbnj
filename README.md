@@ -12,7 +12,7 @@
 
 _pbnj is a simple, minimal self-hosted pastebin solution, focused on getting you started quickly and easily_
 
-[Features](#-features) · [Why?](#-why) · [Cost](#-cost) · [Speedrun](#-speedrun-get-started-under-a-minute)
+[Features](#-features) · [Why?](#-why) · [Cost](#-cost) · [Speedrun](#-speedrun-get-started-under-a-minute) · [Not a Feature](#-intentionally-missing) · [Acknowledgements](#-acknowledgements)
 
 [![Deploy to Cloudflare](https://deploy.workers.cloudflare.com/button)](https://deploy.workers.cloudflare.com/?url=https://github.com/bhavnicksm/pbnj)
 
@@ -20,12 +20,20 @@ _pbnj is a simple, minimal self-hosted pastebin solution, focused on getting you
 
 ## ✨ Features
 
-- Syntax highlighting for 100+ languages
-- Clean, distraction-free interface
-- Easy sharing with memorable URLs
-- Download and copy buttons
-- Social media preview cards
-- CLI tool for terminal workflows
+- 🎨 **Syntax highlighting** for 100+ languages
+- 🧹 **Clean interface** — distraction-free, minimal design
+- 🥪 **Memorable URLs** — `crunchy-peanut-butter-sandwich` instead of `x7f9a2`
+- 📋 **Copy & download** — one-click actions for code
+- 🔗 **Social previews** — rich cards for Twitter, Discord, Slack
+- ⌨️ **CLI-first** — `pbnj file.py` and you're done
+- 🔒 **Private pastes** — unlisted pastes with optional secret keys
+- ✏️ **Update pastes** — edit existing pastes via CLI
+- 📝 **Single-file config** — one `pbnj.config.js` to customize everything
+- 🆔 **Flexible IDs** — choose between sandwich, short, or UUID styles
+- 📦 **File uploads** — drag & drop or pipe from terminal
+- 🌐 **Raw view** — `/r/{id}` for plain text access
+- ☁️ **Edge-powered** — runs on Cloudflare's global network
+- 💸 **Free forever** — Cloudflare's free tier is more than enough
 
 ## 🙋🏻‍♀️ Why?
 
@@ -92,3 +100,31 @@ pbnj myfile.py
 That's it. You now have your own pastebin.
 
 See [cli/README.md](./cli/README.md) for full CLI documentation.
+
+## 🚫 Intentionally Missing
+
+pbnj is opinionated. These features are **not bugs**—they're deliberate choices to keep things simple:
+
+- **No web editor** — Use your terminal. That's the point.
+- **No git integration** — It's a pastebin, not a repository.
+- **No OAuth/accounts** — Single user, single auth key. Done.
+- **No multi-user support** — Fork it and run your own.
+- **No comments/discussions** — Share code, not conversations.
+- **No folders/organization** — The homepage is your feed.
+- **No expiring pastes** — Your pastes live forever (or until you delete them).
+- **No paste editing in browser** — Update via CLI with `pbnj -u <id>`.
+
+If you need these features, check out [Opengist](https://github.com/thomiceli/opengist) or [PrivateBin](https://github.com/PrivateBin/PrivateBin)—they're great projects that take a different approach.
+
+## 🙏 Acknowledgements
+
+pbnj stands on the shoulders of giants. Shoutout to these awesome projects:
+
+- [Opengist](https://github.com/thomiceli/opengist) — A self-hosted pastebin powered by Git
+- [PrivateBin](https://github.com/PrivateBin/PrivateBin) — A minimalist, open source online pastebin with encryption
+- [Hastebin](https://github.com/toptal/haste-server) — The OG open source pastebin
+- [0x0.st](https://0x0.st) — The no-bullshit file hosting and URL shortener
+- [Cloudflare Workers](https://workers.cloudflare.com) — For making serverless actually simple
+- [Astro](https://astro.build) — The web framework that makes this possible
+
+And to everyone who's ever pasted code to share with a friend—you're the reason this exists.

@@ -1,21 +1,24 @@
 ---
 import Layout from '@/layouts/Layout.astro';
+import config from '@/lib/config';
 import hljs from 'highlight.js';
 
-// Fetch pastes from D1 database
+// Fetch pastes from D1 database (only if homepage is enabled)
 const runtime = Astro.locals.runtime as any;
 let pastes: any[] = [];
 
-try {
-	const { results } = await runtime.env.DB.prepare(
-		'SELECT id, language, updated, filename, SUBSTR(code, 1, 200) as preview FROM pastes ORDER BY updated DESC LIMIT 20'
-	).all();
+if (config.homepage) {
+	try {
+		const { results } = await runtime.env.DB.prepare(
+			'SELECT id, language, updated, filename, SUBSTR(code, 1, 200) as preview FROM pastes WHERE is_private = 0 OR is_private IS NULL ORDER BY updated DESC LIMIT 20'
+		).all();
 
-	pastes = results || [];
-} catch (error) {
-	console.error('Error fetching pastes:', error);
-	// If there's an error or no pastes, show empty state
-	pastes = [];
+		pastes = results || [];
+	} catch (error) {
+		console.error('Error fetching pastes:', error);
+		// If there's an error or no pastes, show empty state
+		pastes = [];
+	}
 }
 
 function formatDate(timestamp: number): string {
@@ -39,12 +42,13 @@ function highlightPreview(code: string, language: string): string {
 }
 ---
 
-<Layout title="pbnj.sh">
+<Layout title={config.name}>
 	<div class="max-w-6xl mx-auto pt-6 pb-12">
 		<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
 		{pastes.length === 0 && (
-			<div class="col-span-full text-center py-12 text-paper-muted">
-				No pastes yet. Create your first one!
+			<div class="col-span-full text-center py-12">
+				<img src="/404.png" alt="No pastes yet" class="mx-auto mb-8 max-w-md w-full" />
+				<p class="text-paper-muted">No pastes yet. Create your first one!</p>
 			</div>
 		)}
 		{pastes.map((paste) => (
