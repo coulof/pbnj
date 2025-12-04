@@ -12,7 +12,7 @@
 
 _pbnj is a simple, minimal self-hosted pastebin solution, focused on getting you started quickly and easily_
 
-[Features](#-features) · [Why?](#-why) · [Cost](#-cost) · [CLI](#-cli) · [Deploy](#-deploy-your-own)
+[Features](#-features) · [Why?](#-why) · [Cost](#-cost) · [Speedrun](#-speedrun-get-started-under-a-minute)
 
 [![Deploy to Cloudflare](https://deploy.workers.cloudflare.com/button)](https://deploy.workers.cloudflare.com/?url=https://github.com/bhavnicksm/pbnj)
 
@@ -68,72 +68,27 @@ For personal use, you'll never hit these limits. Even if you somehow do, D1's pa
 
 **TL;DR:** Cloudflare's free tier is more than enough. Stop worrying and start pasting.
 
-## 💻 CLI
+## ⚡ Speedrun: Get Started Under a Minute!
 
-Install the CLI globally:
+**Step 1:** Click the deploy button above and follow the prompts
 
+**Step 2:** Install the CLI
 ```bash
 npm install -g @pbnjs/cli
 ```
 
-Then use it:
-
+**Step 3:** Configure it
 ```bash
-# Upload a file
-pbnj script.py
-
-# Pipe content
-cat logs.txt | pbnj
-
-# Configure your instance
 pbnj --init
+# Enter your worker URL and AUTH_KEY
 ```
 
-See [cli/README.md](./cli/README.md) for full documentation.
+**Step 4:** Paste!
+```bash
+pbnj myfile.py
+# → https://your-pbnj.workers.dev/crunchy-peanut-butter-sandwich
+```
 
-## 🚀 Deploy Your Own
+That's it. You now have your own pastebin.
 
-Click the deploy button above, or follow these steps:
-
-### 📋 Prerequisites
-
-- Node.js 18+
-- A Cloudflare account
-
-### 🔧 Setup
-
-1. Clone and install:
-   ```bash
-   git clone https://github.com/bhavnicksm/pbnj
-   cd pbnj
-   npm install
-   ```
-
-2. Create a D1 database:
-   ```bash
-   npx wrangler d1 create pbnj-db
-   ```
-
-3. Update `wrangler.toml` with your database ID from the output above.
-
-4. Run the schema migration:
-   ```bash
-   npx wrangler d1 execute pbnj-db --remote --file=schema/schema.sql
-   ```
-
-5. Set your AUTH_KEY secret:
-   ```bash
-   npx wrangler secret put AUTH_KEY
-   ```
-
-6. Deploy:
-   ```bash
-   npm run build
-   npx wrangler deploy
-   ```
-
-### 🧪 Local Development
-
-1. Copy `.dev.vars.example` to `.dev.vars` and set your AUTH_KEY
-2. Run `npm run dev`
-
+See [cli/README.md](./cli/README.md) for full CLI documentation.
