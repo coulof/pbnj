@@ -1,43 +1,79 @@
-# Astro Starter Kit: Minimal
+# pbnj
 
-```sh
-npm create astro@latest -- --template minimal
+A minimal, fast pastebin for code snippets. Built with Astro and deployed on Cloudflare Workers.
+
+[![Deploy to Cloudflare](https://deploy.workers.cloudflare.com/button)](https://deploy.workers.cloudflare.com/?url=https://github.com/bhavnicksm/pbnj)
+
+## Features
+
+- Syntax highlighting for 100+ languages
+- Clean, distraction-free interface
+- Easy sharing with memorable URLs
+- Download and copy buttons
+- Social media preview cards
+
+## Deploy Your Own
+
+Click the deploy button above, or follow these steps:
+
+### Prerequisites
+
+- Node.js 18+
+- A Cloudflare account
+
+### Setup
+
+1. Clone and install:
+   ```bash
+   git clone https://github.com/bhavnicksm/pbnj
+   cd pbnj
+   npm install
+   ```
+
+2. Create a D1 database:
+   ```bash
+   npx wrangler d1 create pbnj-db
+   ```
+
+3. Update `wrangler.toml` with your database ID from the output above.
+
+4. Run the schema migration:
+   ```bash
+   npx wrangler d1 execute pbnj-db --remote --file=schema/schema.sql
+   ```
+
+5. Set your AUTH_KEY secret:
+   ```bash
+   npx wrangler secret put AUTH_KEY
+   ```
+
+6. Deploy:
+   ```bash
+   npm run build
+   npx wrangler deploy
+   ```
+
+### Local Development
+
+1. Copy `.dev.vars.example` to `.dev.vars` and set your AUTH_KEY
+2. Run `npm run dev`
+
+## API
+
+### Create Paste
+
+```bash
+curl -X POST https://your-worker.workers.dev/api \
+  -H "Authorization: Bearer YOUR_AUTH_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{"code": "console.log(\"hello\")", "language": "javascript", "filename": "hello.js"}'
 ```
 
-> 🧑‍🚀 **Seasoned astronaut?** Delete this file. Have fun!
+### View Paste
 
-## 🚀 Project Structure
+- Web: `https://your-worker.workers.dev/{paste-id}`
+- Raw: `https://your-worker.workers.dev/r/{paste-id}`
 
-Inside of your Astro project, you'll see the following folders and files:
+## License
 
-```text
-/
-├── public/
-├── src/
-│   └── pages/
-│       └── index.astro
-└── package.json
-```
-
-Astro looks for `.astro` or `.md` files in the `src/pages/` directory. Each page is exposed as a route based on its file name.
-
-There's nothing special about `src/components/`, but that's where we like to put any Astro/React/Vue/Svelte/Preact components.
-
-Any static assets, like images, can be placed in the `public/` directory.
-
-## 🧞 Commands
-
-All commands are run from the root of the project, from a terminal:
-
-| Command                   | Action                                           |
-| :------------------------ | :----------------------------------------------- |
-| `npm install`             | Installs dependencies                            |
-| `npm run dev`             | Starts local dev server at `localhost:4321`      |
-| `npm run build`           | Build your production site to `./dist/`          |
-| `npm run preview`         | Preview your build locally, before deploying     |
-| `npm run astro ...`       | Run CLI commands like `astro add`, `astro check` |
-| `npm run astro -- --help` | Get help using the Astro CLI                     |
-
-## 👀 Want to learn more?
-
-Feel free to check [our documentation](https://docs.astro.build) or jump into our [Discord server](https://astro.build/chat).
+MIT
