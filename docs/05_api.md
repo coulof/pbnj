@@ -200,4 +200,4 @@ Note: Pastes with invalid keys also return 404 to prevent enumeration.
 ```
 
 ---
-pbnj - spread your code
+Next: 06_configuration.md - Configuration options

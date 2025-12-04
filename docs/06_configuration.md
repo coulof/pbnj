@@ -125,3 +125,6 @@ This creates a pastebin with:
 - No public paste listing on homepage
 - 2MB paste limit
 - Dracula dark theme
+
+---
+pbnj - spread your code

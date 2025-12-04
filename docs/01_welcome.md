@@ -29,11 +29,12 @@ That's it. You now have your own pastebin.
 
 ## Documentation
 
-- 01_welcome.md    - You are here
-- 02_deployment.md - How to deploy your own instance
-- 03_cost.md       - Cloudflare pricing breakdown
-- 04_cli.md        - CLI usage and options
-- 05_api.md        - HTTP API reference
+- 01_welcome.md       - You are here
+- 02_deployment.md    - How to deploy your own instance
+- 03_cost.md          - Cloudflare pricing breakdown
+- 04_cli.md           - CLI usage and options
+- 05_api.md           - HTTP API reference
+- 06_configuration.md - Configuration options
 
 ## Links
 
