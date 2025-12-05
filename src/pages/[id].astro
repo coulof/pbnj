@@ -312,7 +312,8 @@ const codePreview = paste.code.slice(0, 150).replace(/\n/g, ' ').trim() + (paste
 				if (response.ok) {
 					window.location.href = '/';
 				} else {
-					alert('Failed to delete paste');
+					const data = await response.json().catch(() => ({}));
+					alert('Failed to delete paste: ' + (data.error || response.statusText));
 				}
 			} catch (err) {
 				alert('Failed to delete paste');
