@@ -43,12 +43,51 @@ const hljsStylePath = `/styles/hljs-${config.theme}.css`;
 	</head>
 	<body class="bg-paper-bg min-h-screen font-sans text-paper-text flex flex-col">
 		<header class="sm:fixed sm:top-0 sm:left-0 w-full sm:z-50">
-			<div class="max-w-[1600px] mx-auto px-8 py-3">
+			<div class="max-w-[1600px] mx-auto px-8 py-3 flex items-center justify-between">
 				<a href="/" class="hover:opacity-70 transition-opacity inline-block" aria-label={`${config.name} home`}>
 					<img src={config.logo} alt={config.name} class="h-8 w-auto" loading="eager" />
 				</a>
+				<div class="flex items-center gap-3">
+					<!-- New paste button (only visible when logged in) -->
+					<a id="new-paste-btn" href="/new" class="hover:opacity-70 transition-opacity" title="New paste" style="display: none;">
+						<img src="/bread.png" alt="New paste" class="h-8 w-auto" loading="eager" />
+					</a>
+					<!-- Auth button: peanut (login) or jelly (logout) -->
+					<button id="auth-btn" class="hover:opacity-70 transition-opacity" title="Login">
+						<img id="auth-img" src="/peanut.png" alt="Login" class="h-8 w-auto" loading="eager" />
+					</button>
+				</div>
 			</div>
 		</header>
+		<script is:inline>
+			(function() {
+				const authBtn = document.getElementById('auth-btn');
+				const authImg = document.getElementById('auth-img');
+				const newPasteBtn = document.getElementById('new-paste-btn');
+				const isLoggedIn = localStorage.getItem('pbnj_auth_key');
+
+				if (isLoggedIn) {
+					authImg.src = '/jelly.png';
+					authImg.alt = 'Logout';
+					authBtn.title = 'Logout';
+					newPasteBtn.style.display = 'block';
+				}
+
+				authBtn.addEventListener('click', () => {
+					if (localStorage.getItem('pbnj_auth_key')) {
+						localStorage.removeItem('pbnj_auth_key');
+						authImg.src = '/peanut.png';
+						authImg.alt = 'Login';
+						authBtn.title = 'Login';
+						newPasteBtn.style.display = 'none';
+					} else {
+						// Store current page to return after login
+						const returnUrl = encodeURIComponent(window.location.pathname + window.location.search);
+						window.location.href = '/login?return=' + returnUrl;
+					}
+				});
+			})();
+		</script>
 		<main class="sm:pt-16 px-8 max-w-[1600px] w-full mx-auto flex-1">
 			<slot />
 		</main>

@@ -29,10 +29,14 @@ import config from '@/lib/config';
 	const button = document.getElementById('continue-btn') as HTMLButtonElement;
 	const wrapper = document.getElementById('auth-wrapper') as HTMLDivElement;
 
+	// Get return URL from query params
+	const urlParams = new URLSearchParams(window.location.search);
+	const returnUrl = urlParams.get('return') || '/';
+
 	// Check if already logged in
 	const existingKey = localStorage.getItem('pbnj_auth_key');
 	if (existingKey) {
-		window.location.href = '/new';
+		window.location.href = returnUrl;
 	}
 
 	function showError() {
@@ -69,7 +73,7 @@ import config from '@/lib/config';
 
 			if (response.ok) {
 				localStorage.setItem('pbnj_auth_key', key);
-				window.location.href = '/new';
+				window.location.href = returnUrl;
 			} else {
 				showError();
 				button.style.opacity = '1';

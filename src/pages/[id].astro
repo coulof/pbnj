@@ -42,7 +42,7 @@ try {
 }
 
 // Prepare OG metadata
-const filename = paste.filename || `${id}.${paste.language}`;
+const filename = paste.filename || id;
 const codePreview = paste.code.slice(0, 150).replace(/\n/g, ' ').trim() + (paste.code.length > 150 ? '...' : '');
 ---
 
@@ -50,7 +50,7 @@ const codePreview = paste.code.slice(0, 150).replace(/\n/g, ' ').trim() + (paste
 	<div class="max-w-6xl mx-auto pb-12">
 		<div class="mb-3 flex items-center justify-between gap-3">
 			<h1 class="text-xl sm:text-2xl font-medium text-paper-text truncate">
-				{paste.filename || `${id}.${paste.language}`}
+				{paste.filename || id}
 			</h1>
 
 			<!-- Desktop buttons -->
@@ -99,6 +99,20 @@ const codePreview = paste.code.slice(0, 150).replace(/\n/g, ' ').trim() + (paste
 						<path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
 						<polyline points="7 10 12 15 17 10"></polyline>
 						<line x1="12" y1="15" x2="12" y2="3"></line>
+					</svg>
+				</button>
+				<button
+					id="delete-btn"
+					class="p-2 text-paper-text bg-paper-bg2 border border-paper-border rounded hover:border-paper-border-hover transition-colors"
+					title="Delete paste"
+					data-id={id}
+					style="display: none;"
+				>
+					<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+						<polyline points="3 6 5 6 21 6"></polyline>
+						<path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+						<line x1="10" y1="11" x2="10" y2="17"></line>
+						<line x1="14" y1="11" x2="14" y2="17"></line>
 					</svg>
 				</button>
 			</div>
@@ -163,6 +177,20 @@ const codePreview = paste.code.slice(0, 150).replace(/\n/g, ' ').trim() + (paste
 						</svg>
 						Download
 					</button>
+					<button
+						id="mobile-delete-btn"
+						class="flex items-center gap-3 px-4 py-2 text-paper-text hover:bg-paper-bg2 transition-colors w-full text-left"
+						data-id={id}
+						style="display: none;"
+					>
+						<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+							<polyline points="3 6 5 6 21 6"></polyline>
+							<path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+							<line x1="10" y1="11" x2="10" y2="17"></line>
+							<line x1="14" y1="11" x2="14" y2="17"></line>
+						</svg>
+						Delete
+					</button>
 				</div>
 			</div>
 		</div>
@@ -173,6 +201,15 @@ const codePreview = paste.code.slice(0, 150).replace(/\n/g, ' ').trim() + (paste
 	</div>
 
 	<script is:inline>
+		// Show delete buttons if logged in
+		const authKey = localStorage.getItem('pbnj_auth_key');
+		if (authKey) {
+			const deleteBtn = document.getElementById('delete-btn');
+			const mobileDeleteBtn = document.getElementById('mobile-delete-btn');
+			if (deleteBtn) deleteBtn.style.display = 'block';
+			if (mobileDeleteBtn) mobileDeleteBtn.style.display = 'flex';
+		}
+
 		// Mobile menu toggle
 		const menuBtn = document.getElementById('menu-btn');
 		const menuDropdown = document.getElementById('menu-dropdown');
@@ -256,6 +293,38 @@ const codePreview = paste.code.slice(0, 150).replace(/\n/g, ' ').trim() + (paste
 
 		document.getElementById('mobile-download-btn')?.addEventListener('click', function() {
 			downloadFile(this);
+		});
+
+		// Delete paste (desktop + mobile)
+		async function deletePaste(btn) {
+			const pasteId = btn?.dataset.id;
+			const authKey = localStorage.getItem('pbnj_auth_key');
+			if (!pasteId || !authKey) return;
+
+			try {
+				const response = await fetch(`/api/${pasteId}`, {
+					method: 'DELETE',
+					headers: {
+						'Authorization': `Bearer ${authKey}`,
+					},
+				});
+
+				if (response.ok) {
+					window.location.href = '/';
+				} else {
+					alert('Failed to delete paste');
+				}
+			} catch (err) {
+				alert('Failed to delete paste');
+			}
+		}
+
+		document.getElementById('delete-btn')?.addEventListener('click', function() {
+			deletePaste(this);
+		});
+
+		document.getElementById('mobile-delete-btn')?.addEventListener('click', function() {
+			deletePaste(this);
 		});
 	</script>
 

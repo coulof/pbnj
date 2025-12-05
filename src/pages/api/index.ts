@@ -51,6 +51,22 @@ function isUniqueConstraintError(error: unknown): boolean {
   return false;
 }
 
+// Generate unique snippet filename
+async function generateSnippetFilename(db: any): Promise<string> {
+  // Count existing snippets to determine the next number
+  const result = await db.prepare(
+    `SELECT COUNT(*) as count FROM pastes WHERE filename = 'snippet' OR filename LIKE 'snippet #%'`
+  ).first();
+
+  const count = result?.count || 0;
+
+  if (count === 0) {
+    return 'snippet';
+  }
+
+  return `snippet #${count + 1}`;
+}
+
 // GET /api - List pastes
 export const GET: APIRoute = async ({ url, locals }) => {
   try {
@@ -221,6 +237,11 @@ export const POST: APIRoute = async ({ request, locals }) => {
       });
     }
 
+    // Generate filename if not provided
+    if (!filename || filename.trim() === '') {
+      filename = await generateSnippetFilename(runtime.env.DB);
+    }
+
     // Try up to 3 times with different IDs in case of collision
     const maxAttempts = 3;
     let lastError: unknown;
@@ -234,7 +255,7 @@ export const POST: APIRoute = async ({ request, locals }) => {
         await runtime.env.DB.prepare(
           'INSERT INTO pastes (id, code, language, updated, filename, is_private, secret_key) VALUES (?, ?, ?, ?, ?, ?, ?)'
         )
-          .bind(id, code, lang, updated, filename || null, isPrivate ? 1 : 0, secretKey)
+          .bind(id, code, lang, updated, filename, isPrivate ? 1 : 0, secretKey)
           .run();
 
         // Success - return the response
