@@ -93,7 +93,9 @@ For personal use, you'll never hit these limits. Even if you somehow do, D1's pa
 
 ## ⚡ Speedrun: Get Started Under a Minute!
 
-**Step 1:** Click the deploy button above and follow the prompts
+**Step 1:** Click the deploy button above and follow the prompts. The most important here is to set the `AUTH_KEY` because you'd need that to make the pastes. Once you've clicked deploy, it takes about 25-30 seconds and your deployment will be ready! 
+
+![deploy](./assets/deploy.png)
 
 **Step 2:** Install the CLI
 ```bash
