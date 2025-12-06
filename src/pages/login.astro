@@ -34,8 +34,8 @@ import config from '@/lib/config';
 	const returnUrl = urlParams.get('return') || '/';
 
 	// Check if already logged in
-	const existingKey = localStorage.getItem('pbnj_auth_key');
-	if (existingKey) {
+	const isLoggedIn = localStorage.getItem('pbnj_logged_in');
+	if (isLoggedIn) {
 		window.location.href = returnUrl;
 	}
 
@@ -63,16 +63,18 @@ import config from '@/lib/config';
 		button.style.pointerEvents = 'none';
 
 		try {
-			// Validate by making a test request to the API
-			const response = await fetch('/api/verify', {
+			// Login and create session
+			const response = await fetch('/api/auth/login', {
 				method: 'POST',
 				headers: {
-					'Authorization': `Bearer ${key}`,
+					'Content-Type': 'application/json',
 				},
+				body: JSON.stringify({ key }),
 			});
 
 			if (response.ok) {
-				localStorage.setItem('pbnj_auth_key', key);
+				// Store flag for UI state (not the actual key)
+				localStorage.setItem('pbnj_logged_in', 'true');
 				window.location.href = returnUrl;
 			} else {
 				showError();

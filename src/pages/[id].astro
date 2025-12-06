@@ -202,8 +202,8 @@ const codePreview = paste.code.slice(0, 150).replace(/\n/g, ' ').trim() + (paste
 
 	<script is:inline>
 		// Show delete buttons if logged in
-		const authKey = localStorage.getItem('pbnj_auth_key');
-		if (authKey) {
+		const isLoggedIn = localStorage.getItem('pbnj_logged_in');
+		if (isLoggedIn) {
 			const deleteBtn = document.getElementById('delete-btn');
 			const mobileDeleteBtn = document.getElementById('mobile-delete-btn');
 			if (deleteBtn) deleteBtn.style.display = 'block';
@@ -298,15 +298,12 @@ const codePreview = paste.code.slice(0, 150).replace(/\n/g, ' ').trim() + (paste
 		// Delete paste (desktop + mobile)
 		async function deletePaste(btn) {
 			const pasteId = btn?.dataset.id;
-			const authKey = localStorage.getItem('pbnj_auth_key');
-			if (!pasteId || !authKey) return;
+			if (!pasteId) return;
 
 			try {
 				const response = await fetch(`/api/${pasteId}`, {
 					method: 'DELETE',
-					headers: {
-						'Authorization': `Bearer ${authKey}`,
-					},
+					credentials: 'same-origin', // Include session cookie
 				});
 
 				if (response.ok) {

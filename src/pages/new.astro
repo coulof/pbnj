@@ -97,8 +97,8 @@ import config from '@/lib/config';
 
 <script>
 	// Check if logged in
-	const authKey = localStorage.getItem('pbnj_auth_key');
-	if (!authKey) {
+	const isLoggedIn = localStorage.getItem('pbnj_logged_in');
+	if (!isLoggedIn) {
 		window.location.href = '/login?return=' + encodeURIComponent('/new');
 	}
 
@@ -174,9 +174,9 @@ import config from '@/lib/config';
 				method: 'POST',
 				headers: {
 					'Content-Type': 'application/json',
-					'Authorization': `Bearer ${authKey}`,
 				},
 				body: JSON.stringify(body),
+				credentials: 'same-origin', // Include session cookie
 			});
 
 			if (!response.ok) {

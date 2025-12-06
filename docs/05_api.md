@@ -2,10 +2,20 @@
 
 ## Authentication
 
-All write operations require a Bearer token:
+pbnj supports two authentication methods:
+
+### Bearer Token (CLI/API)
+
+For programmatic access via CLI or API, use a Bearer token:
 ```
 Authorization: Bearer YOUR_AUTH_KEY
 ```
+
+### Session Cookie (Web)
+
+The web interface uses secure HttpOnly session cookies. When you log in via the web, a session is created that expires after 30 days. The session cookie is automatically sent with requests from the browser.
+
+Both authentication methods are accepted by all authenticated endpoints.
 
 ## Endpoints
 

@@ -83,5 +83,19 @@ To use a custom domain (e.g., paste.yourdomain.com):
 
 The local server will be available at http://localhost:4321
 
+## Upgrading
+
+When upgrading pbnj, you may need to run database migrations:
+
+```bash
+# Check for new migrations in schema/migrations/
+ls schema/migrations/
+
+# Run any new migrations
+npx wrangler d1 execute pbnj-db --remote --file=schema/migrations/002_add_sessions.sql
+```
+
+New deployments automatically get the latest schema. Existing deployments need to run migrations manually.
+
 ---
 Next: 03_cost.md - Cloudflare pricing breakdown

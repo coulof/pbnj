@@ -1,4 +1,5 @@
 import type { APIRoute } from 'astro';
+import { isAuthenticated } from '@/lib/auth';
 
 // PUT /api/:id - Update paste
 export const PUT: APIRoute = async ({ params, request, locals }) => {
@@ -6,11 +7,9 @@ export const PUT: APIRoute = async ({ params, request, locals }) => {
     const { id } = params;
     const runtime = locals.runtime as any;
 
-    // Check authentication
-    const authHeader = request.headers.get('Authorization');
-    const expectedAuth = `Bearer ${runtime.env.AUTH_KEY}`;
-
-    if (authHeader !== expectedAuth) {
+    // Check authentication (session cookie or Bearer token)
+    const isAuthed = await isAuthenticated(request, runtime.env.DB, runtime.env.AUTH_KEY);
+    if (!isAuthed) {
       return new Response(JSON.stringify({ error: 'Unauthorized' }), {
         status: 401,
         headers: { 'Content-Type': 'application/json' },
@@ -71,11 +70,9 @@ export const DELETE: APIRoute = async ({ params, request, locals }) => {
     const { id } = params;
     const runtime = locals.runtime as any;
 
-    // Check authentication
-    const authHeader = request.headers.get('Authorization');
-    const expectedAuth = `Bearer ${runtime.env.AUTH_KEY}`;
-
-    if (authHeader !== expectedAuth) {
+    // Check authentication (session cookie or Bearer token)
+    const isAuthed = await isAuthenticated(request, runtime.env.DB, runtime.env.AUTH_KEY);
+    if (!isAuthed) {
       return new Response(JSON.stringify({ error: 'Unauthorized' }), {
         status: 401,
         headers: { 'Content-Type': 'application/json' },

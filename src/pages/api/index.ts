@@ -1,6 +1,7 @@
 import type { APIRoute } from 'astro';
 import { generateId } from '@/lib/id';
 import config, { parseSize } from '@/lib/config';
+import { isAuthenticated } from '@/lib/auth';
 
 // Detect language from filename extension
 function detectLanguage(filename: string): string {
@@ -109,11 +110,9 @@ export const DELETE: APIRoute = async ({ request, locals }) => {
   try {
     const runtime = locals.runtime as any;
 
-    // Check authentication
-    const authHeader = request.headers.get('Authorization');
-    const expectedAuth = `Bearer ${runtime.env.AUTH_KEY}`;
-
-    if (authHeader !== expectedAuth) {
+    // Check authentication (session cookie or Bearer token)
+    const isAuthed = await isAuthenticated(request, runtime.env.DB, runtime.env.AUTH_KEY);
+    if (!isAuthed) {
       return new Response(JSON.stringify({ error: 'Unauthorized' }), {
         status: 401,
         headers: { 'Content-Type': 'application/json' },
@@ -148,11 +147,9 @@ export const POST: APIRoute = async ({ request, locals }) => {
     // Get runtime from Astro locals (Cloudflare binding)
     const runtime = locals.runtime as any;
 
-    // Check authentication
-    const authHeader = request.headers.get('Authorization');
-    const expectedAuth = `Bearer ${runtime.env.AUTH_KEY}`;
-
-    if (authHeader !== expectedAuth) {
+    // Check authentication (session cookie or Bearer token)
+    const isAuthed = await isAuthenticated(request, runtime.env.DB, runtime.env.AUTH_KEY);
+    if (!isAuthed) {
       return new Response(JSON.stringify({ error: 'Unauthorized' }), {
         status: 401,
         headers: { 'Content-Type': 'application/json' },

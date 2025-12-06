@@ -4,7 +4,14 @@ pbnj includes a web interface for creating and managing pastes directly from you
 
 ## Authentication
 
-The web interface uses the same `AUTH_KEY` as the CLI and API. Authentication state is stored in your browser's localStorage.
+The web interface uses secure session-based authentication:
+
+- **Login**: Enter your `AUTH_KEY` to create a session
+- **Sessions**: Stored server-side in D1, expire after 30 days
+- **Cookies**: HttpOnly session cookie (can't be accessed by JavaScript)
+- **Security**: Your auth key is never stored in the browser after login
+
+This is more secure than storing credentials in localStorage, as the actual auth key is only used once during login.
 
 ### Header Icons
 
@@ -54,7 +61,11 @@ The delete button appears in:
 
 ## Logout
 
-Click the jelly icon in the header to log out. This clears the auth key from your browser's localStorage.
+Click the jelly icon in the header to log out. This invalidates your session on the server and clears the session cookie.
+
+## Private Pastes on Homepage
+
+When logged in, the homepage shows all your pastes including private ones. Private pastes are marked with a lock icon (🔒). When logged out, only public pastes are visible.
 
 ---
 Next: Back to 01_welcome.md
