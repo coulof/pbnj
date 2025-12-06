@@ -38,7 +38,7 @@ pbnj script.py
 cat error.log | pbnj
 
 # List your pastes
-pbnj list
+pbnj -l
 
 # Update an existing paste
 pbnj -u crunchy-peanut-butter-toast newfile.py
@@ -98,10 +98,10 @@ cat updated.log | pbnj -u <paste-id>
 
 ```bash
 # List recent pastes (default: 10)
-pbnj list
+pbnj -l
 
 # List more pastes
-pbnj list --limit 20
+pbnj -l 20
 ```
 
 ### Delete a paste
@@ -118,17 +118,13 @@ pbnj -d <paste-id>
 | `-f, --filename <name>` | Set filename for the paste |
 | `-u, --update <id>` | Update an existing paste |
 | `-d, --delete <id>` | Delete a paste by ID |
+| `-l, --list [n]` | List recent pastes (default: 10, or specify count) |
+| `-n, --no-copy` | Don't copy URL to clipboard after creating paste |
 | `-p, --private` | Create a private (unlisted) paste |
 | `-s, --secret <key>` | Set a secret key for private paste |
 | `-h, --help` | Show help |
 | `-v, --version` | Show version |
 | `--init` | Configure your pbnj instance |
-
-### List command options
-
-| Option | Description |
-|--------|-------------|
-| `-l, --limit <n>` | Number of pastes to show (default: 10) |
 
 ## Supported Languages
 
