@@ -30,6 +30,9 @@ npx @pbnjs/cli myfile.py
 # Configure your pbnj instance
 pbnj --init
 
+# Show current configuration
+pbnj --show-config
+
 # Paste a file
 pbnj script.py
 # → https://pbnj.sh/crunchy-peanut-butter-toast (copied to clipboard)
@@ -125,6 +128,7 @@ pbnj -d <paste-id>
 | `-h, --help` | Show help |
 | `-v, --version` | Show version |
 | `--init` | Configure your pbnj instance |
+| `--show-config` | Show current configuration (masks auth key for security) |
 
 ## Supported Languages
 

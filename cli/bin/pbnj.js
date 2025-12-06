@@ -112,6 +112,46 @@ async function readStdin() {
   });
 }
 
+function showConfig() {
+  const config = getConfig();
+  const host = process.env.PBNJ_HOST || config.PBNJ_HOST;
+  const authKey = process.env.PBNJ_AUTH_KEY || config.PBNJ_AUTH_KEY;
+
+  console.log('\nCurrent Configuration:\n');
+
+  if (host) {
+    console.log(`  Host: ${host}`);
+    if (process.env.PBNJ_HOST) {
+      console.log('        (from environment variable)');
+    } else {
+      console.log(`        (from ${CONFIG_FILE})`);
+    }
+  } else {
+    console.log('  Host: not configured');
+  }
+
+  console.log('');
+
+  if (authKey) {
+    // Mask the auth key for security
+    const masked = authKey.substring(0, 8) + '***' + authKey.substring(authKey.length - 4);
+    console.log(`  Auth Key: ${masked}`);
+    if (process.env.PBNJ_AUTH_KEY) {
+      console.log('            (from environment variable)');
+    } else {
+      console.log(`            (from ${CONFIG_FILE})`);
+    }
+  } else {
+    console.log('  Auth Key: not configured');
+  }
+
+  console.log('');
+
+  if (!host || !authKey) {
+    console.log('Run `pbnj --init` to configure your pbnj instance.\n');
+  }
+}
+
 function showHelp() {
   console.log(`
 pbnj - CLI for pbnj.sh pastebin
@@ -125,6 +165,7 @@ Usage:
   pbnj -d <id>             Delete a paste
   pbnj -D                  Delete all pastes
   pbnj --init              Configure your pbnj instance
+  pbnj --show-config       Show current configuration
 
 Options:
   -L, --language <lang>    Override language detection
@@ -139,6 +180,7 @@ Options:
   -h, --help               Show this help
   -v, --version            Show version
   --init                   Set up configuration
+  --show-config            Show current configuration
 
 Configuration (~/.pbnj):
   PBNJ_HOST=https://your-pbnj-instance.workers.dev
@@ -466,6 +508,11 @@ async function main() {
 
     if (arg === '--init') {
       await initConfig();
+      process.exit(0);
+    }
+
+    if (arg === '--show-config') {
+      showConfig();
       process.exit(0);
     }
 
