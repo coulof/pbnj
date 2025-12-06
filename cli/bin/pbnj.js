@@ -132,21 +132,6 @@ function showConfig() {
 
   console.log('');
 
-  if (authKey) {
-    // Mask the auth key for security
-    const masked = authKey.substring(0, 8) + '***' + authKey.substring(authKey.length - 4);
-    console.log(`  Auth Key: ${masked}`);
-    if (process.env.PBNJ_AUTH_KEY) {
-      console.log('            (from environment variable)');
-    } else {
-      console.log(`            (from ${CONFIG_FILE})`);
-    }
-  } else {
-    console.log('  Auth Key: not configured');
-  }
-
-  console.log('');
-
   if (!host || !authKey) {
     console.log('Run `pbnj --init` to configure your pbnj instance.\n');
   }

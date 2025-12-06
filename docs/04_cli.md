@@ -26,7 +26,7 @@ View your current configuration:
 pbnj --show-config
 ```
 
-This displays your host URL and auth key (masked for security).
+This displays your host URL.
 
 ## Usage
 

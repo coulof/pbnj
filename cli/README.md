@@ -128,7 +128,7 @@ pbnj -d <paste-id>
 | `-h, --help` | Show help |
 | `-v, --version` | Show version |
 | `--init` | Configure your pbnj instance |
-| `--show-config` | Show current configuration (masks auth key for security) |
+| `--show-config` | Show current host URL configuration |
 
 ## Supported Languages
 
