@@ -26,7 +26,7 @@ export default {
   //   Light: 'flexoki-light' (default), 'github-light', 'gruvbox-light', 'catppuccin-latte'
   //   Dark: 'flexoki-dark', 'github-dark', 'nord', 'gruvbox-dark', 'dracula',
   //         'catppuccin-frappe', 'catppuccin-macchiato', 'catppuccin-mocha'
-  theme: "flexoki-light",
+  theme: "dracula",
 
   // Footer configuration (optional)
   // footer: {
